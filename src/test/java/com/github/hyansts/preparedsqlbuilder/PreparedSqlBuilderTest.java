@@ -89,7 +89,7 @@ class PreparedSqlBuilderTest {
 								   .and(tb.AGE.eq(age)));
 
 		String expectedSQL =
-				"SELECT e.id, e.name, e.age FROM employees as e WHERE e.is_active = ? AND e.name = ? AND e.age = ?;";
+				"SELECT e.id, e.name, e.age FROM employees AS e WHERE e.is_active = ? AND e.name = ? AND e.age = ?;";
 		List<Object> expectedValues = List.of(isActive, name, age);
 		assertEquals(expectedSQL, buildSql.getSql());
 		assertEquals(expectedValues, buildSql.getValues());
