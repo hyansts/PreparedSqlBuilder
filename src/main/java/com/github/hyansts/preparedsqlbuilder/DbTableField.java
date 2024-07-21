@@ -129,24 +129,24 @@ public class DbTableField<T> {
 		return new SqlCondition(this, NOT_IN, values);
 	}
 
-	public String max() {
-		return SqlAggregator.max(this.FIELD_NAME);
+	public DbTableField<T> max() {
+		return new DbTableField<>(SqlAggregator.max(this.getFieldLabel()), this.TABLE);
 	}
 
-	public String min() {
-		return SqlAggregator.min(this.FIELD_NAME);
+	public DbTableField<T> min() {
+		return new DbTableField<>(SqlAggregator.min(this.getFieldLabel()), this.TABLE);
 	}
 
-	public String avg() {
-		return SqlAggregator.avg(this.FIELD_NAME);
+	public DbTableField<Double> avg() {
+		return new DbTableField<>(SqlAggregator.avg(this.getFieldLabel()), this.TABLE);
 	}
 
-	public String count() {
-		return SqlAggregator.count(this.FIELD_NAME);
+	public DbTableField<Long> count() {
+		return new DbTableField<>(SqlAggregator.count(this.getFieldLabel()), this.TABLE);
 	}
 
-	public String sum() {
-		return SqlAggregator.sum(this.FIELD_NAME);
+	public DbTableField<Double> sum() {
+		return new DbTableField<>(SqlAggregator.sum(this.getFieldLabel()), this.TABLE);
 	}
 
 	public DbTableField<T> asc() {
