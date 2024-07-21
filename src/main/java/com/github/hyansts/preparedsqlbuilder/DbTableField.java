@@ -1,5 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
@@ -164,13 +166,18 @@ public class DbTableField<T> {
 		return this;
 	}
 
-	public T getValue() {
+	T getInsertValue() {
 		return this.insertValue;
 	}
 
 	public DbTableField<T> value(T value) {
 		this.insertValue = value;
 		return this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public T get(ResultSet resultSet) throws SQLException {
+		return (T) resultSet.getObject(this.getFieldLabel());
 	}
 
 	public String getFieldLabel() {

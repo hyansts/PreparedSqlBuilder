@@ -100,11 +100,11 @@ public class PreparedSqlBuilder {
 
 		for (var field : fields) {
 			joinedFields.add(field.getFieldName());
-			if (field.getValue() == null) {
+			if (field.getInsertValue() == null) {
 				joinedValues.add("null");
 				continue;
 			}
-			this.values.add(field.getValue());
+			this.values.add(field.getInsertValue());
 			joinedValues.add("?");
 		}
 		this.sql.append(joinedFields).append(VALUES).append(joinedValues);
