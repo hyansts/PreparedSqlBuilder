@@ -1,5 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder;
 
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
+
 public interface DbTable {
 	String getTableName();
 
@@ -12,7 +14,7 @@ public interface DbTable {
 	}
 
 	default String getTableNameDefinition() {
-		return getTableAlias() == null ? getFullTableName() : getFullTableName() + " as " + getTableAlias();
+		return getTableAlias() == null ? getFullTableName() : getFullTableName() + AS + getTableAlias();
 	}
 
 	default String getFullTableName() {

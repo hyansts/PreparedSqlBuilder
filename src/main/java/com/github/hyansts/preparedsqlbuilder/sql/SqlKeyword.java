@@ -16,10 +16,6 @@ public enum SqlKeyword {
 	DISTINCT("DISTINCT "),
 	ORDER_BY(" ORDER BY "),
 	GROUP_BY(" GROUP BY "),
-	CASE("CASE "),
-	WHEN(" WHEN "),
-	THEN(" THEN "),
-	END(" END"),
 	AS(" AS ");
 
 	private final String keyword;

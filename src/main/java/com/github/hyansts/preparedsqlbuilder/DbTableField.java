@@ -5,6 +5,7 @@ import java.util.List;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.*;
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
 public class DbTableField<T> {
 
@@ -181,7 +182,7 @@ public class DbTableField<T> {
 	}
 
 	public String getFieldNameDefinition() {
-		return this.alias == null ? this.getFullFieldName() : this.getFullFieldName() + " as " + this.alias;
+		return this.alias == null ? this.getFullFieldName() : this.getFullFieldName() + AS + this.alias;
 	}
 
 	public String getFieldName() { return this.FIELD_NAME; }

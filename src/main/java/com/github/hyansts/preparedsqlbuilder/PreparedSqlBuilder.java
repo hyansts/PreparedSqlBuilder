@@ -24,13 +24,34 @@ public class PreparedSqlBuilder {
 		return this;
 	}
 
+	public PreparedSqlBuilder select(String expression, DbTableField<?>... fields) {
+		this.sql.append(SELECT).append(expression);
+		if (fields != null && fields.length > 0) {
+			this.sql.append(", ").append(chainFieldsDefinitions(fields));
+		}
+		return this;
+	}
+
 	public PreparedSqlBuilder selectDistinct(DbTableField<?>... fields) {
 		sql.append(SELECT).append(DISTINCT).append(chainFieldsDefinitions(fields));
 		return this;
 	}
 
+	public PreparedSqlBuilder selectDistinct(String expression, DbTableField<?>... fields) {
+		this.sql.append(SELECT).append(DISTINCT).append(expression);
+		if (fields != null && fields.length > 0) {
+			this.sql.append(", ").append(chainFieldsDefinitions(fields));
+		}
+		return this;
+	}
+
 	public PreparedSqlBuilder selectCount(DbTableField<?> field) {
 		sql.append(SELECT).append(SqlAggregator.count(field.getFullFieldName()));
+		return this;
+	}
+
+	public PreparedSqlBuilder selectCount() {
+		sql.append(SELECT).append(SqlAggregator.count("*"));
 		return this;
 	}
 
@@ -68,13 +89,13 @@ public class PreparedSqlBuilder {
 	}
 
 	public PreparedSqlBuilder insertInto(DbTable table) {
-		this.sql.append(INSERT_INTO).append(table.getFullTableName());
+		this.sql.append(INSERT_INTO).append(table.getFullTableName()).append(' ');
 		return this;
 	}
 
 	public PreparedSqlBuilder values(DbTableField<?>... fields) {
 
-		StringJoiner joinedFields = new StringJoiner(", ", " (", ")");
+		StringJoiner joinedFields = new StringJoiner(", ", "(", ")");
 		StringJoiner joinedValues = new StringJoiner(", ", "(", ")");
 
 		for (var field : fields) {
@@ -126,31 +147,6 @@ public class PreparedSqlBuilder {
 			joinedFields.add(field.getFullFieldName() + field.getSortOrder());
 		}
 		this.sql.append(ORDER_BY).append(joinedFields);
-		return this;
-	}
-
-	// TODO: transformar em função sql, não cabe aqui nesta classe.
-	public PreparedSqlBuilder caseWhenThen(SqlCondition baseCondition, SqlCondition condition, DbTableField<?> field) {
-		this.values.addAll(baseCondition.getComparedValues());
-		this.values.addAll(condition.getComparedValues());
-		this.sql.append(CASE).append(baseCondition).append(WHEN).append(condition).append(THEN).append(field.getFieldLabel());
-		return this;
-	}
-
-	public PreparedSqlBuilder caseWhenThen(SqlCondition condition, DbTableField<?> field) {
-		this.values.addAll(condition.getComparedValues());
-		this.sql.append(CASE.toString().trim()).append(WHEN).append(condition).append(THEN).append(field.getFieldLabel());
-		return this;
-	}
-
-	public PreparedSqlBuilder whenThen(SqlCondition condition, DbTableField<?> field) {
-		this.values.addAll(condition.getComparedValues());
-		this.sql.append(WHEN).append(condition).append(THEN).append(field.getFieldLabel());
-		return this;
-	}
-
-	public PreparedSqlBuilder endCase(String alias) {
-		this.sql.append(END).append(AS).append(alias);
 		return this;
 	}
 
