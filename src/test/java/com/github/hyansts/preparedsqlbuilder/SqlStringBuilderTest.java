@@ -144,7 +144,7 @@ class SqlStringBuilderTest {
 	}
 
 	@Test
-	public void testGrupByClause() {
+	public void testGroupByClause() {
 		SqlStringBuilder buildSql = new SqlStringBuilder();
 
 		buildSql.select("role", "salary", SqlAggregator.count("*"))

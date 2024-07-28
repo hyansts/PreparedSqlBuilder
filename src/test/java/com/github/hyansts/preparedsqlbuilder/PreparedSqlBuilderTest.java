@@ -8,20 +8,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PreparedSqlBuilderTest {
 
-	private static class MockDbTable extends BaseDbTable<MockDbTable> {
+	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 
 		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
 		public final DbTableField<String> NAME = new DbTableField<>("name", this);
 		public final DbTableField<Integer> AGE = new DbTableField<>("age", this);
 		public final DbTableField<Boolean> IS_ACTIVE = new DbTableField<>("is_active", this);
+		public final DbTableField<Integer> DEPARTMENT_ID = new DbTableField<>("department_id", this);
 
-		public MockDbTable() { super("employees"); }
+		public EmployeesDbTable() { super("employees"); }
+	}
+
+	private static class DepartmentDbTable extends BaseDbTable<DepartmentDbTable> {
+
+		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
+		public final DbTableField<String> DESCRIPTION = new DbTableField<>("description", this);
+
+		public DepartmentDbTable() { super("department"); }
 	}
 
 	@Test
 	public void testSingleSelectWhereClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final String name = "John Doe";
 
@@ -39,7 +48,7 @@ class PreparedSqlBuilderTest {
 	@Test
 	public void testSelectDistinctClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final String name = "John Doe";
 
@@ -55,9 +64,27 @@ class PreparedSqlBuilderTest {
 	}
 
 	@Test
+	public void testSelectCountClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		final String name = "John Doe";
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.selectCount()
+				.from(tb)
+				.where(tb.NAME.eq(name));
+
+		String expectedSQL = "SELECT COUNT(*) FROM employees WHERE employees.name = ?;";
+		List<Object> expectedValues = List.of(name);
+		assertEquals(expectedSQL, buildSql.getSql());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
 	public void testSelectCountParamClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final String name = "John Doe";
 
@@ -75,7 +102,7 @@ class PreparedSqlBuilderTest {
 	@Test
 	public void testSelectWhereAliasClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final boolean isActive = true;
 		final String name = "John Doe";
@@ -96,9 +123,55 @@ class PreparedSqlBuilderTest {
 	}
 
 	@Test
+	public void testSelectWithExpressionClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		final String expression = "CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END";
+		final String name = "John Doe";
+		final int age = 30;
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.select(expression, tb.ID, tb.NAME, tb.AGE)
+				.from(tb.as("e"))
+				.where(tb.NAME.eq(name)
+							  .and(tb.AGE.eq(age)));
+
+		String expectedSQL =
+				"SELECT CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END, " +
+						"e.id, e.name, e.age FROM employees AS e WHERE e.name = ? AND e.age = ?;";
+		List<Object> expectedValues = List.of(name, age);
+		assertEquals(expectedSQL, buildSql.getSql());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
+	public void testSelectDistinctWithExpressionClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		final String expression = "CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END";
+		final String name = "John Doe";
+		final int age = 30;
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.selectDistinct(expression, tb.ID, tb.NAME, tb.AGE)
+				.from(tb.as("e"))
+				.where(tb.NAME.eq(name)
+							  .and(tb.AGE.eq(age)));
+
+		String expectedSQL =
+				"SELECT DISTINCT CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END, " +
+						"e.id, e.name, e.age FROM employees AS e WHERE e.name = ? AND e.age = ?;";
+		List<Object> expectedValues = List.of(name, age);
+		assertEquals(expectedSQL, buildSql.getSql());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
 	public void testSingleColumnUpdateClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final String name = "John Doe";
 		final int id = 1;
@@ -117,7 +190,7 @@ class PreparedSqlBuilderTest {
 	@Test
 	public void testMultipleColumnUpdateClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final String name = "John Doe";
 		final int age = 30;
@@ -140,7 +213,7 @@ class PreparedSqlBuilderTest {
 	@Test
 	public void testUpdateNoWhereClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final boolean isActive = false;
 
@@ -155,9 +228,26 @@ class PreparedSqlBuilderTest {
 	}
 
 	@Test
+	public void testDeleteFromClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		final Integer id = 1;
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.deleteFrom(tb)
+				.where(tb.ID.eq(id));
+
+		String expected = "DELETE FROM employees WHERE employees.id = ?;";
+		List<Object> expectedValues = List.of(id);
+		assertEquals(expected, buildSql.toString());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
 	public void testInsertClause() {
 
-		MockDbTable tb = new MockDbTable();
+		EmployeesDbTable tb = new EmployeesDbTable();
 
 		final int id = 100;
 		final String name = "John Doe";
@@ -175,6 +265,101 @@ class PreparedSqlBuilderTest {
 		List<Object> expectedValues = List.of(id, name, age, isActive);
 		assertEquals(expected, buildSql.toString());
 		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
+	public void testInnerJoinClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		final String name = "John Doe";
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.select("*")
+				.from(tb.as("e"))
+				.innerJoin(dtb.as("d"))
+				.on(tb.DEPARTMENT_ID.eq(dtb.ID))
+				.where(tb.NAME.eq(name));
+
+		String expected =
+				"SELECT * FROM employees AS e INNER JOIN department AS d ON e.department_id = d.id WHERE e.name = ?;";
+		List<Object> expectedValues = List.of(name);
+		assertEquals(expected, buildSql.toString());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
+	public void testLeftJoinClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		final String name = "John Doe";
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.select("*")
+				.from(tb.as("e"))
+				.leftJoin(dtb.as("d"))
+				.on(tb.DEPARTMENT_ID.eq(dtb.ID))
+				.where(tb.NAME.eq(name));
+
+		String expected =
+				"SELECT * FROM employees AS e LEFT JOIN department AS d ON e.department_id = d.id WHERE e.name = ?;";
+		List<Object> expectedValues = List.of(name);
+		assertEquals(expected, buildSql.toString());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
+	public void testRightJoinClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		final String name = "John Doe";
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.select("*")
+				.from(tb.as("e"))
+				.rigtJoin(dtb.as("d"))
+				.on(tb.DEPARTMENT_ID.eq(dtb.ID))
+				.where(tb.NAME.eq(name));
+
+		String expected =
+				"SELECT * FROM employees AS e RIGHT JOIN department AS d ON e.department_id = d.id WHERE e.name = ?;";
+		List<Object> expectedValues = List.of(name);
+		assertEquals(expected, buildSql.toString());
+		assertEquals(expectedValues, buildSql.getValues());
+	}
+
+	@Test
+	public void testGroupByClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.select(tb.DEPARTMENT_ID, tb.AGE, tb.ID.count())
+				.from(tb)
+				.groupBy(tb.DEPARTMENT_ID, tb.AGE);
+
+		String expected =
+				"SELECT employees.department_id, employees.age, COUNT(employees.id) FROM employees GROUP BY employees.department_id, employees.age;";
+		assertEquals(expected, buildSql.getSql());
+	}
+
+	@Test
+	public void testOrderByClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		PreparedSqlBuilder buildSql = new PreparedSqlBuilder();
+		buildSql.select("*")
+				.from(tb)
+				.orderBy(tb.NAME.asc(), tb.AGE.desc());
+
+		String expected = "SELECT * FROM employees ORDER BY employees.name ASC, employees.age DESC;";
+		assertEquals(expected, buildSql.getSql());
 	}
 
 }

@@ -132,23 +132,23 @@ public class DbTableField<T> {
 	}
 
 	public DbTableField<T> max() {
-		return new DbTableField<>(SqlAggregator.max(this.getFieldLabel()), this.TABLE);
+		return new DbTableField<>(SqlAggregator.max(this.getFieldLabel()), null);
 	}
 
 	public DbTableField<T> min() {
-		return new DbTableField<>(SqlAggregator.min(this.getFieldLabel()), this.TABLE);
+		return new DbTableField<>(SqlAggregator.min(this.getFieldLabel()), null);
 	}
 
 	public DbTableField<Double> avg() {
-		return new DbTableField<>(SqlAggregator.avg(this.getFieldLabel()), this.TABLE);
+		return new DbTableField<>(SqlAggregator.avg(this.getFieldLabel()), null);
 	}
 
 	public DbTableField<Long> count() {
-		return new DbTableField<>(SqlAggregator.count(this.getFieldLabel()), this.TABLE);
+		return new DbTableField<>(SqlAggregator.count(this.getFieldLabel()), null);
 	}
 
 	public DbTableField<Double> sum() {
-		return new DbTableField<>(SqlAggregator.sum(this.getFieldLabel()), this.TABLE);
+		return new DbTableField<>(SqlAggregator.sum(this.getFieldLabel()), null);
 	}
 
 	public DbTableField<T> asc() {
@@ -185,7 +185,8 @@ public class DbTableField<T> {
 	}
 
 	public String getFullFieldName() {
-		return this.TABLE == null || this.TABLE.getTableLabel() == null ? this.FIELD_NAME : this.TABLE.getTableLabel() + "." + this.FIELD_NAME;
+		return this.TABLE == null || this.TABLE.getTableLabel() == null
+					   ? this.FIELD_NAME : this.TABLE.getTableLabel() + "." + this.FIELD_NAME;
 	}
 
 	public String getFieldNameDefinition() {

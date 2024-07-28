@@ -60,6 +60,7 @@ public class PreparedSqlBuilder {
 		return this;
 	}
 
+	//TODO: Needs to make fully qualification of column name optional to support DELETE FROM statements in SQLite
 	public PreparedSqlBuilder where(SqlCondition condition) {
 		this.values.addAll(condition.getComparedValues());
 		this.sql.append(WHERE).append(condition);
