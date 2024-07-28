@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.function.Supplier;
 
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 

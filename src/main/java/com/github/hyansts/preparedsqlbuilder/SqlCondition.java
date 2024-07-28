@@ -10,6 +10,7 @@ public class SqlCondition {
 
 	private final List<Object> comparedValues = new ArrayList<>();
 	private String sql;
+	private int parenthesisLayer = 1;
 
 	public <T> SqlCondition(DbTableField<T> tf, SqlConditionOperator op) {
 		this.sql = tf.getFullFieldName() + op;
@@ -49,14 +50,22 @@ public class SqlCondition {
 
 	public SqlCondition and(SqlCondition sqlCondition) {
 		this.comparedValues.addAll(sqlCondition.getComparedValues());
-		this.sql = this.sql + SqlConditionOperator.AND + sqlCondition.getSql();
+		this.sql += SqlConditionOperator.AND + evaluateParenthesisLayer(sqlCondition);
 		return this;
 	}
 
 	public SqlCondition or(SqlCondition sqlCondition) {
 		this.comparedValues.addAll(sqlCondition.getComparedValues());
-		this.sql = this.sql + SqlConditionOperator.OR + sqlCondition.getSql();
+		this.sql += SqlConditionOperator.OR + evaluateParenthesisLayer(sqlCondition);
 		return this;
+	}
+
+	private String evaluateParenthesisLayer(SqlCondition otherCondition) {
+		this.parenthesisLayer = otherCondition.parenthesisLayer + 1;
+		if (otherCondition.parenthesisLayer % 2 == 0) {
+			return "(" + otherCondition.getSql() + ")";
+		}
+		return otherCondition.getSql();
 	}
 
 	public List<Object> getComparedValues() { return comparedValues; }
