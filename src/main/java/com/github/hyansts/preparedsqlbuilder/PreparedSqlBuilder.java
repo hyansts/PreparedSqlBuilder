@@ -15,7 +15,7 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 public class PreparedSqlBuilder {
 
 	private final StringBuilder sql = new StringBuilder(128);
-	private final List<Supplier<String>> fieldDefinitionSuppliers = new ArrayList<>();
+	private final List<DbTableField<?>> selectedFields = new ArrayList<>();
 	private final List<Object> values = new ArrayList<>();
 	private boolean chainNextSetClause = false;
 
@@ -60,7 +60,6 @@ public class PreparedSqlBuilder {
 		return this;
 	}
 
-	//TODO: Needs to make fully qualification of column name optional to support DELETE FROM statements in SQLite
 	public PreparedSqlBuilder where(SqlCondition condition) {
 		this.values.addAll(condition.getComparedValues());
 		this.sql.append(WHERE).append(condition);
@@ -145,7 +144,7 @@ public class PreparedSqlBuilder {
 	public PreparedSqlBuilder orderBy(DbTableField<?>... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
-			joinedFields.add(field.getFullFieldName() + field.getSortOrder());
+			joinedFields.add(field.getFieldLabel() + field.getSortOrder());
 		}
 		this.sql.append(ORDER_BY).append(joinedFields);
 		return this;
@@ -154,7 +153,7 @@ public class PreparedSqlBuilder {
 	private String chainFieldsDefinitions(DbTableField<?>... fields) {
 		StringJoiner clause = new StringJoiner(", ");
 		for (var field : fields) {
-			this.fieldDefinitionSuppliers.add(field::getFieldNameDefinition);
+			this.selectedFields.add(field);
 			clause.add("%s");
 		}
 		return clause.toString();
@@ -170,10 +169,10 @@ public class PreparedSqlBuilder {
 	public List<Object> getValues() { return values; }
 
 	public String getSql() {
-		Object[] fieldsString = new String[fieldDefinitionSuppliers.size()];
+		Object[] fieldsString = new String[this.selectedFields.size()];
 		int i = 0;
-		for (var supplier : fieldDefinitionSuppliers) {
-			fieldsString[i++] = supplier.get();
+		for (var field : this.selectedFields) {
+			fieldsString[i++] = field.getFieldNameDefinition();
 		}
 		this.sql.append(';');
 		return String.format(this.sql.toString(), fieldsString);

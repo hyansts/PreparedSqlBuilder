@@ -180,13 +180,13 @@ public class DbTableField<T> {
 		return (T) resultSet.getObject(this.getFieldLabel());
 	}
 
-	public String getFieldLabel() {
-		return this.alias == null ? this.getFullFieldName() : this.alias;
+	public String getFullFieldName() {
+		return this.TABLE == null || this.TABLE.getTableAlias() == null
+					   ? this.FIELD_NAME : this.TABLE.getTableAlias() + "." + this.FIELD_NAME;
 	}
 
-	public String getFullFieldName() {
-		return this.TABLE == null || this.TABLE.getTableLabel() == null
-					   ? this.FIELD_NAME : this.TABLE.getTableLabel() + "." + this.FIELD_NAME;
+	public String getFieldLabel() {
+		return this.alias == null ? this.getFullFieldName() : this.alias;
 	}
 
 	public String getFieldNameDefinition() {

@@ -9,10 +9,6 @@ public interface DbTable {
 
 	String getTablePrefix();
 
-	default String getTableLabel() {
-		return getTableAlias() == null ? getFullTableName() : getTableAlias();
-	}
-
 	default String getTableNameDefinition() {
 		return getTableAlias() == null ? getFullTableName() : getFullTableName() + AS + getTableAlias();
 	}
