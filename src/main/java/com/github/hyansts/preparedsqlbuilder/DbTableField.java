@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
+import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.*;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;

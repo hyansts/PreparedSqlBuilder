@@ -1,10 +1,10 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.sql;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator;
+import com.github.hyansts.preparedsqlbuilder.DbTableField;
 
 public class SqlCondition {
 

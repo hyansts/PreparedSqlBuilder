@@ -1,8 +1,8 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.sql;
 
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator;
+import com.github.hyansts.preparedsqlbuilder.DbTableField;
 
 import org.junit.jupiter.api.Test;
 
