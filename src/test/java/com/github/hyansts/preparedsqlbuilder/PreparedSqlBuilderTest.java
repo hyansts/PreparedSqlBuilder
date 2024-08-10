@@ -36,7 +36,7 @@ class PreparedSqlBuilderTest {
 
 		final String name = "John Doe";
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select(tb.ID)
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
@@ -54,7 +54,7 @@ class PreparedSqlBuilderTest {
 
 		final String name = "John Doe";
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.selectDistinct(tb.ID)
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
@@ -72,7 +72,7 @@ class PreparedSqlBuilderTest {
 
 		final String name = "John Doe";
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.selectCount()
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
@@ -90,7 +90,7 @@ class PreparedSqlBuilderTest {
 
 		final String name = "John Doe";
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.selectCount(tb.ID)
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
@@ -110,7 +110,7 @@ class PreparedSqlBuilderTest {
 		final String name = "John Doe";
 		final int age = 30;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select(tb.ID, tb.NAME, tb.AGE)
 			 .from(tb.as("e"))
 			 .where(tb.IS_ACTIVE.eq(isActive)
@@ -133,7 +133,7 @@ class PreparedSqlBuilderTest {
 		final String name = "John Doe";
 		final int age = 30;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select(expression, tb.ID, tb.NAME, tb.AGE)
 			 .from(tb.as("e"))
 			 .where(tb.NAME.eq(name)
@@ -156,7 +156,7 @@ class PreparedSqlBuilderTest {
 		final String name = "John Doe";
 		final int age = 30;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.selectDistinct(expression, tb.ID, tb.NAME, tb.AGE)
 			 .from(tb.as("e"))
 			 .where(tb.NAME.eq(name)
@@ -178,7 +178,7 @@ class PreparedSqlBuilderTest {
 		final String name = "John Doe";
 		final int id = 1;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
 			 .set(tb.NAME, name)
 			 .where(tb.ID.eq(id));
@@ -199,7 +199,7 @@ class PreparedSqlBuilderTest {
 		final boolean isActive = true;
 		final int id = 1;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
 			 .set(tb.NAME, name)
 			 .set(tb.AGE, age)
@@ -219,7 +219,7 @@ class PreparedSqlBuilderTest {
 
 		final boolean isActive = false;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
 			 .set(tb.IS_ACTIVE, isActive);
 
@@ -236,7 +236,7 @@ class PreparedSqlBuilderTest {
 
 		final Integer id = 1;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.deleteFrom(tb)
 			 .where(tb.ID.eq(id));
 
@@ -256,7 +256,7 @@ class PreparedSqlBuilderTest {
 		final int age = 30;
 		final boolean isActive = true;
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.insertInto(tb)
 			 .values(tb.ID.value(id),
 					 tb.NAME.value(name),
@@ -277,8 +277,8 @@ class PreparedSqlBuilderTest {
 
 		final String title = "Sales";
 
-		SqlQuery query = SqlQueryFactory.create();
-		query.select("*")
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
 			 .from(tb.as("e"))
 			 .innerJoin(dtb.as("d"))
 			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
@@ -299,8 +299,8 @@ class PreparedSqlBuilderTest {
 
 		final String title = "Sales";
 
-		SqlQuery query = SqlQueryFactory.create();
-		query.select("*")
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
 			 .from(tb.as("e"))
 			 .leftJoin(dtb.as("d"))
 			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
@@ -320,8 +320,8 @@ class PreparedSqlBuilderTest {
 
 		final String title = "Sales";
 
-		SqlQuery query = SqlQueryFactory.create();
-		query.select("*")
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
 			 .from(tb.as("e"))
 			 .rightJoin(dtb.as("d"))
 			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
@@ -335,11 +335,54 @@ class PreparedSqlBuilderTest {
 	}
 
 	@Test
+	public void testFullJoinClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		final String title = "Sales";
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb.as("e"))
+			 .fullJoin(dtb.as("d"))
+			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
+			 .where(dtb.TITLE.eq(title));
+
+		String expected =
+				"SELECT * FROM employees AS e FULL JOIN department AS d ON e.department_id = d.id WHERE d.title = ?;";
+		List<Object> expectedValues = List.of(title);
+		assertEquals(expected, query.toString());
+		assertEquals(expectedValues, query.getValues());
+	}
+
+	@Test
+	public void testCrossJoinClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		final String title = "Sales";
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb.as("e"))
+			 .crossJoin(dtb.as("d"))
+			 .where(dtb.TITLE.eq(title));
+
+		String expected =
+				"SELECT * FROM employees AS e CROSS JOIN department AS d WHERE d.title = ?;";
+		List<Object> expectedValues = List.of(title);
+		assertEquals(expected, query.toString());
+		assertEquals(expectedValues, query.getValues());
+	}
+
+	@Test
 	public void testGroupByClause() {
 
 		EmployeesDbTable tb = new EmployeesDbTable();
 
-		SqlQuery query = SqlQueryFactory.create();
+		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select(tb.DEPARTMENT_ID, tb.AGE, tb.ID.count())
 			 .from(tb)
 			 .groupBy(tb.DEPARTMENT_ID, tb.AGE);
@@ -349,16 +392,83 @@ class PreparedSqlBuilderTest {
 	}
 
 	@Test
+	public void testHavingClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		final int age = 30;
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select(tb.DEPARTMENT_ID, tb.AGE, tb.ID.count())
+			 .from(tb)
+			 .groupBy(tb.DEPARTMENT_ID, tb.AGE)
+			 .having(tb.AGE.gt(age));
+
+		List<Object> expectedValues = List.of(age);
+		String expected =
+				"SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age HAVING age > ?;";
+		assertEquals(expected, query.getSql());
+		assertEquals(expectedValues, query.getValues());
+	}
+
+	@Test
 	public void testOrderByClause() {
 
 		EmployeesDbTable tb = new EmployeesDbTable();
 
-		SqlQuery query = SqlQueryFactory.create();
-		query.select("*")
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
 			 .from(tb)
 			 .orderBy(tb.NAME.asc(), tb.AGE.desc());
 
 		String expected = "SELECT * FROM employees ORDER BY name ASC, age DESC;";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testLimitClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .limit(1);
+
+		String expected = "SELECT * FROM employees LIMIT 1;";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testLimitOffsetClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .limit(1)
+			 .offset(10);
+
+		String expected = "SELECT * FROM employees LIMIT 1 OFFSET 10;";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testUnionClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery query2 = SqlQueryFactory.createQuery();
+		query.select()
+			  .from(tb)
+			  .union(query2.select()
+						   .from(dtb));
+
+		//TODO: fix duplicate semicolon at the end
+		String expected = "SELECT * FROM employees UNION SELECT * FROM department;;";
 		assertEquals(expected, query.getSql());
 	}
 

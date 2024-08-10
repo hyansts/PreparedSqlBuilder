@@ -11,11 +11,22 @@ public enum SqlKeyword {
 	INNER_JOIN(" INNER JOIN "),
 	LEFT_JOIN(" LEFT JOIN "),
 	RIGHT_JOIN(" RIGHT JOIN "),
+	FULL_JOIN(" FULL JOIN "),
+	CROSS_JOIN(" CROSS JOIN "),
 	ON(" ON "),
 	SET(" SET "),
 	DISTINCT("DISTINCT "),
 	ORDER_BY(" ORDER BY "),
 	GROUP_BY(" GROUP BY "),
+	HAVING(" HAVING "),
+	LIMIT(" LIMIT "),
+	OFFSET(" OFFSET "),
+	UNION(" UNION "),
+	UNION_ALL(" UNION ALL "),
+	INTERSECT(" INTERSECT "),
+	INTERSECT_ALL(" INTERSECT ALL "),
+	EXCEPT(" EXCEPT "),
+	EXCEPT_ALL(" EXCEPT ALL "),
 	AS(" AS ");
 
 	private final String keyword;

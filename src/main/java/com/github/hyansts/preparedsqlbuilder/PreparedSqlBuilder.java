@@ -146,14 +146,14 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 
 	@Override
 	public SqlQueryBuilder fullJoin(DbTable table) {
-		//TODO
-		return null;
+		this.sql.append(FULL_JOIN).append(table.getTableNameDefinition());
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder crossJoin(DbTable table) {
-		//TODO
-		return null;
+		this.sql.append(CROSS_JOIN).append(table.getTableNameDefinition());
+		return this;
 	}
 
 	@Override
@@ -174,9 +174,10 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder having(SqlCondition sqlCondition) {
-		//TODO
-		return null;
+	public SqlQueryBuilder having(SqlCondition condition) {
+		this.values.addAll(condition.getComparedValues());
+		this.sql.append(HAVING).append(condition);
+		return this;
 	}
 
 	@Override
@@ -191,50 +192,57 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 
 	@Override
 	public SqlQueryBuilder limit(Integer number) {
-		//TODO
-		return null;
+		this.sql.append(LIMIT).append(number);
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder offset(Integer number) {
-		//TODO
-		return null;
+		this.sql.append(OFFSET).append(number);
+		return this;
 	}
 
+	//TODO: fix duplicate semicolon at the end
 	@Override
 	public SqlQueryBuilder union(CombinableQuery query) {
-		//TODO
-		return null;
+		this.values.addAll(query.getValues());
+		this.sql.append(UNION).append(query);
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder unionAll(CombinableQuery query) {
-		//TODO
-		return null;
+		this.values.addAll(query.getValues());
+		this.sql.append(UNION_ALL).append(query);
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder intersect(CombinableQuery query) {
-		//TODO
-		return null;
+		this.values.addAll(query.getValues());
+		this.sql.append(INTERSECT).append(query);
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder intersectAll(CombinableQuery query) {
-		//TODO
-		return null;
+		this.values.addAll(query.getValues());
+		this.sql.append(INTERSECT_ALL).append(query);
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder except(CombinableQuery query) {
-		//TODO
-		return null;
+		this.values.addAll(query.getValues());
+		this.sql.append(EXCEPT).append(query);
+		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder exceptAll(CombinableQuery query) {
-		//TODO
-		return null;
+		this.values.addAll(query.getValues());
+		this.sql.append(EXCEPT_ALL).append(query);
+		return this;
 	}
 
 	//TODO: create a better way to interface with PreparedStatement
@@ -263,6 +271,7 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	public String toString() { return getSql(); }
 
 	private String chainFieldsDefinitions(DbTableField<?>... fields) {
+		if (fields == null || fields.length == 0) { return "*"; }
 		StringJoiner clause = new StringJoiner(", ");
 		for (var field : fields) {
 			this.selectedFields.add(field);
