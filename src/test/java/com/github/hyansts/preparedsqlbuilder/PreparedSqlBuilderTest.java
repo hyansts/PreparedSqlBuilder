@@ -41,7 +41,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
 
-		String expectedSQL = "SELECT id FROM employees WHERE name = ?;";
+		String expectedSQL = "SELECT id FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -59,7 +59,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
 
-		String expectedSQL = "SELECT DISTINCT id FROM employees WHERE name = ?;";
+		String expectedSQL = "SELECT DISTINCT id FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -77,7 +77,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
 
-		String expectedSQL = "SELECT COUNT(*) FROM employees WHERE name = ?;";
+		String expectedSQL = "SELECT COUNT(*) FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -95,7 +95,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .where(tb.NAME.eq(name));
 
-		String expectedSQL = "SELECT COUNT(id) FROM employees WHERE name = ?;";
+		String expectedSQL = "SELECT COUNT(id) FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -118,7 +118,7 @@ class PreparedSqlBuilderTest {
 								.and(tb.AGE.eq(age)));
 
 		String expectedSQL =
-				"SELECT e.id, e.name, e.age FROM employees AS e WHERE e.is_active = ? AND e.name = ? AND e.age = ?;";
+				"SELECT e.id, e.name, e.age FROM employees AS e WHERE e.is_active = ? AND e.name = ? AND e.age = ?";
 		List<Object> expectedValues = List.of(isActive, name, age);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -141,7 +141,7 @@ class PreparedSqlBuilderTest {
 
 		String expectedSQL =
 				"SELECT CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END, " +
-						"e.id, e.name, e.age FROM employees AS e WHERE e.name = ? AND e.age = ?;";
+						"e.id, e.name, e.age FROM employees AS e WHERE e.name = ? AND e.age = ?";
 		List<Object> expectedValues = List.of(name, age);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -164,7 +164,7 @@ class PreparedSqlBuilderTest {
 
 		String expectedSQL =
 				"SELECT DISTINCT CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END, " +
-						"e.id, e.name, e.age FROM employees AS e WHERE e.name = ? AND e.age = ?;";
+						"e.id, e.name, e.age FROM employees AS e WHERE e.name = ? AND e.age = ?";
 		List<Object> expectedValues = List.of(name, age);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -183,7 +183,7 @@ class PreparedSqlBuilderTest {
 			 .set(tb.NAME, name)
 			 .where(tb.ID.eq(id));
 
-		String expectedSQL = "UPDATE employees SET name = ? WHERE id = ?;";
+		String expectedSQL = "UPDATE employees SET name = ? WHERE id = ?";
 		List<Object> expectedValues = List.of(name, id);
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
@@ -206,7 +206,7 @@ class PreparedSqlBuilderTest {
 			 .set(tb.IS_ACTIVE, isActive)
 			 .where(tb.ID.eq(id));
 
-		String expectedSQL = "UPDATE employees SET name = ?, age = ?, is_active = ? WHERE id = ?;";
+		String expectedSQL = "UPDATE employees SET name = ?, age = ?, is_active = ? WHERE id = ?";
 		List<Object> expectedValues = List.of(name, age, isActive, id);
 		assertEquals(expectedSQL, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -223,7 +223,7 @@ class PreparedSqlBuilderTest {
 		query.update(tb)
 			 .set(tb.IS_ACTIVE, isActive);
 
-		String expected = "UPDATE employees SET is_active = ?;";
+		String expected = "UPDATE employees SET is_active = ?";
 		List<Object> expectedValues = List.of(isActive);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -240,7 +240,7 @@ class PreparedSqlBuilderTest {
 		query.deleteFrom(tb)
 			 .where(tb.ID.eq(id));
 
-		String expected = "DELETE FROM employees WHERE id = ?;";
+		String expected = "DELETE FROM employees WHERE id = ?";
 		List<Object> expectedValues = List.of(id);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -263,7 +263,7 @@ class PreparedSqlBuilderTest {
 					 tb.AGE.value(age),
 					 tb.IS_ACTIVE.value(isActive));
 
-		String expected = "INSERT INTO employees (id, name, age, is_active) VALUES (?, ?, ?, ?);";
+		String expected = "INSERT INTO employees (id, name, age, is_active) VALUES (?, ?, ?, ?)";
 		List<Object> expectedValues = List.of(id, name, age, isActive);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -285,7 +285,7 @@ class PreparedSqlBuilderTest {
 			 .where(dtb.TITLE.eq(title));
 
 		String expected =
-				"SELECT * FROM employees AS e INNER JOIN department AS d ON e.department_id = d.id WHERE d.title = ?;";
+				"SELECT * FROM employees AS e INNER JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -306,7 +306,7 @@ class PreparedSqlBuilderTest {
 			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
 			 .where(dtb.TITLE.eq(title));
 		String expected =
-				"SELECT * FROM employees AS e LEFT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?;";
+				"SELECT * FROM employees AS e LEFT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -328,7 +328,7 @@ class PreparedSqlBuilderTest {
 			 .where(dtb.TITLE.eq(title));
 
 		String expected =
-				"SELECT * FROM employees AS e RIGHT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?;";
+				"SELECT * FROM employees AS e RIGHT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -350,7 +350,7 @@ class PreparedSqlBuilderTest {
 			 .where(dtb.TITLE.eq(title));
 
 		String expected =
-				"SELECT * FROM employees AS e FULL JOIN department AS d ON e.department_id = d.id WHERE d.title = ?;";
+				"SELECT * FROM employees AS e FULL JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -371,7 +371,7 @@ class PreparedSqlBuilderTest {
 			 .where(dtb.TITLE.eq(title));
 
 		String expected =
-				"SELECT * FROM employees AS e CROSS JOIN department AS d WHERE d.title = ?;";
+				"SELECT * FROM employees AS e CROSS JOIN department AS d WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
 		assertEquals(expected, query.toString());
 		assertEquals(expectedValues, query.getValues());
@@ -387,7 +387,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .groupBy(tb.DEPARTMENT_ID, tb.AGE);
 
-		String expected = "SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age;";
+		String expected = "SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age";
 		assertEquals(expected, query.getSql());
 	}
 
@@ -406,7 +406,7 @@ class PreparedSqlBuilderTest {
 
 		List<Object> expectedValues = List.of(age);
 		String expected =
-				"SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age HAVING age > ?;";
+				"SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age HAVING age > ?";
 		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
@@ -421,7 +421,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .orderBy(tb.NAME.asc(), tb.AGE.desc());
 
-		String expected = "SELECT * FROM employees ORDER BY name ASC, age DESC;";
+		String expected = "SELECT * FROM employees ORDER BY name ASC, age DESC";
 		assertEquals(expected, query.getSql());
 	}
 
@@ -435,7 +435,7 @@ class PreparedSqlBuilderTest {
 			 .from(tb)
 			 .limit(1);
 
-		String expected = "SELECT * FROM employees LIMIT 1;";
+		String expected = "SELECT * FROM employees LIMIT 1";
 		assertEquals(expected, query.getSql());
 	}
 
@@ -450,7 +450,7 @@ class PreparedSqlBuilderTest {
 			 .limit(1)
 			 .offset(10);
 
-		String expected = "SELECT * FROM employees LIMIT 1 OFFSET 10;";
+		String expected = "SELECT * FROM employees LIMIT 1 OFFSET 10";
 		assertEquals(expected, query.getSql());
 	}
 
@@ -463,12 +463,11 @@ class PreparedSqlBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlQuery query2 = SqlQueryFactory.createQuery();
 		query.select()
-			  .from(tb)
-			  .union(query2.select()
-						   .from(dtb));
+			 .from(tb)
+			 .union(query2.select()
+						  .from(dtb));
 
-		//TODO: fix duplicate semicolon at the end
-		String expected = "SELECT * FROM employees UNION SELECT * FROM department;;";
+		String expected = "SELECT * FROM employees UNION SELECT * FROM department";
 		assertEquals(expected, query.getSql());
 	}
 

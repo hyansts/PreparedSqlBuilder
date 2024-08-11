@@ -119,12 +119,8 @@ public class SqlStringBuilder {
 		}
 	}
 
-	public String getSql() {
-		return sql.append(';').toString();
-	}
+	public String getSql() { return sql.toString(); }
 
 	@Override
-	public String toString() {
-		return getSql();
-	}
+	public String toString() { return getSql(); }
 }

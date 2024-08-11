@@ -202,7 +202,6 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 		return this;
 	}
 
-	//TODO: fix duplicate semicolon at the end
 	@Override
 	public SqlQueryBuilder union(CombinableQuery query) {
 		this.values.addAll(query.getValues());
@@ -263,7 +262,6 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 		for (var field : this.selectedFields) {
 			fieldsString[i++] = field.getFieldNameDefinition();
 		}
-		this.sql.append(';');
 		return String.format(this.sql.toString(), fieldsString);
 	}
 

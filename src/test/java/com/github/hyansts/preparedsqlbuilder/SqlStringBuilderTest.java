@@ -16,7 +16,7 @@ class SqlStringBuilderTest {
 				.from("employees")
 				.where("name = 'John Doe'");
 
-		String expected = "SELECT id FROM employees WHERE name = 'John Doe';";
+		String expected = "SELECT id FROM employees WHERE name = 'John Doe'";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -28,7 +28,7 @@ class SqlStringBuilderTest {
 				.from("employees")
 				.where("name = 'John Doe'");
 
-		String expected = "SELECT DISTINCT id FROM employees WHERE name = 'John Doe';";
+		String expected = "SELECT DISTINCT id FROM employees WHERE name = 'John Doe'";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -40,7 +40,7 @@ class SqlStringBuilderTest {
 				.from("employees")
 				.where("name = 'John Doe'");
 
-		String expected = "SELECT COUNT(id) FROM employees WHERE name = 'John Doe';";
+		String expected = "SELECT COUNT(id) FROM employees WHERE name = 'John Doe'";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -52,7 +52,7 @@ class SqlStringBuilderTest {
 				.from("employees")
 				.where("name = 'John Doe'");
 
-		String expected = "SELECT COUNT(*) FROM employees WHERE name = 'John Doe';";
+		String expected = "SELECT COUNT(*) FROM employees WHERE name = 'John Doe'";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -64,7 +64,7 @@ class SqlStringBuilderTest {
 				.set("name", "John Doe")
 				.where("id = 1");
 
-		String expected = "UPDATE employees SET name = 'John Doe' WHERE id = 1;";
+		String expected = "UPDATE employees SET name = 'John Doe' WHERE id = 1";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -78,7 +78,7 @@ class SqlStringBuilderTest {
 				.set("is_active", true)
 				.where("id = 1");
 
-		String expected = "UPDATE employees SET name = 'John Doe', age = 30, is_active = true WHERE id = 1;";
+		String expected = "UPDATE employees SET name = 'John Doe', age = 30, is_active = true WHERE id = 1";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -89,7 +89,7 @@ class SqlStringBuilderTest {
 		buildSql.deleteFrom("employees")
 				.where("id = 1");
 
-		String expected = "DELETE FROM employees WHERE id = 1;";
+		String expected = "DELETE FROM employees WHERE id = 1";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -100,7 +100,7 @@ class SqlStringBuilderTest {
 		buildSql.insertInto("employees", "name", "age", "is_active")
 				.values("John Doe", 30, true);
 
-		String expected = "INSERT INTO employees (name, age, is_active) VALUES ('John Doe', 30, true);";
+		String expected = "INSERT INTO employees (name, age, is_active) VALUES ('John Doe', 30, true)";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -113,7 +113,7 @@ class SqlStringBuilderTest {
 				.innerJoin("department as d")
 				.on("e.dep_id = d.id");
 
-		String expected = "SELECT * FROM employees as e INNER JOIN department as d ON e.dep_id = d.id;";
+		String expected = "SELECT * FROM employees as e INNER JOIN department as d ON e.dep_id = d.id";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -126,7 +126,7 @@ class SqlStringBuilderTest {
 				.leftJoin("department as d")
 				.on("e.dep_id = d.id");
 
-		String expected = "SELECT * FROM employees as e LEFT JOIN department as d ON e.dep_id = d.id;";
+		String expected = "SELECT * FROM employees as e LEFT JOIN department as d ON e.dep_id = d.id";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -139,7 +139,7 @@ class SqlStringBuilderTest {
 				.rigtJoin("department as d")
 				.on("e.dep_id = d.id");
 
-		String expected = "SELECT * FROM employees as e RIGHT JOIN department as d ON e.dep_id = d.id;";
+		String expected = "SELECT * FROM employees as e RIGHT JOIN department as d ON e.dep_id = d.id";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -151,7 +151,7 @@ class SqlStringBuilderTest {
 				.from("employees")
 				.groupBy("role", "salary");
 
-		String expected = "SELECT role, salary, COUNT(*) FROM employees GROUP BY role, salary;";
+		String expected = "SELECT role, salary, COUNT(*) FROM employees GROUP BY role, salary";
 		assertEquals(expected, buildSql.getSql());
 	}
 
@@ -163,7 +163,7 @@ class SqlStringBuilderTest {
 				.from("employees")
 				.orderBy("salary DESC", "role ASC");
 
-		String expected = "SELECT role, salary FROM employees ORDER BY salary DESC, role ASC;";
+		String expected = "SELECT role, salary FROM employees ORDER BY salary DESC, role ASC";
 		assertEquals(expected, buildSql.getSql());
 	}
 }
