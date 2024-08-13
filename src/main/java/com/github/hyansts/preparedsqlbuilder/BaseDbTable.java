@@ -1,5 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder;
 
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
+
 public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 
 	private final String TABLE_NAME;
@@ -16,6 +18,7 @@ public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 		this.TABLE_PREFIX = prefix;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public T as(String alias) {
 		this.tableAlias = alias;
@@ -26,9 +29,21 @@ public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 	public String getTableName() { return this.TABLE_NAME; }
 
 	@Override
-	public String getTableAlias() { return this.tableAlias; }
+	public String getAlias() { return this.tableAlias; }
 
 	@Override
 	public String getTablePrefix() { return this.TABLE_PREFIX; }
+
+	@Override
+	public String getDefinition() {
+		return this.tableAlias == null || this.tableAlias.isBlank()
+					   ? getFullTableName() : getFullTableName() + AS + this.tableAlias;
+	}
+
+	@Override
+	public String getFullTableName() {
+		return this.TABLE_PREFIX == null || this.TABLE_PREFIX.isBlank()
+					   ? this.TABLE_NAME : this.TABLE_PREFIX + "." + this.TABLE_NAME;
+	}
 
 }

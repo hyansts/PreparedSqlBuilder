@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.DbTableField;
+import com.github.hyansts.preparedsqlbuilder.DbComparableField;
+import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 
 public class SqlCondition {
 
@@ -12,29 +13,29 @@ public class SqlCondition {
 	private String sql;
 	private int parenthesisLayer = 1;
 
-	public <T> SqlCondition(DbTableField<T> tf, SqlConditionOperator op) {
-		this.sql = tf.getFullFieldName() + op;
+	public SqlCondition(DbComparableField<?> tf, SqlConditionOperator op) {
+		this.sql = tf.getFullQualification() + op;
 	}
 
-	public <T> SqlCondition(DbTableField<T> tf1, SqlConditionOperator op, DbTableField<T> tf2) {
-		this.sql = tf1.getFullFieldName() + op + tf2.getFullFieldName();
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, DbComparableField<T> tf2) {
+		this.sql = tf1.getFullQualification() + op + tf2.getFullQualification();
 	}
 
-	public <T> SqlCondition(DbTableField<T> tf1, SqlConditionOperator op, T val) {
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, T val) {
 		this.comparedValues.add(val);
-		this.sql = tf1.getFullFieldName() + op + "?";
+		this.sql = tf1.getFullQualification() + op + "?";
 	}
 
-	public <T> SqlCondition(DbTableField<T> tf, SqlConditionOperator op1, T val1, SqlConditionOperator op2, T val2) {
+	public <T> SqlCondition(DbComparableField<T> tf, SqlConditionOperator op1, T val1, SqlConditionOperator op2, T val2) {
 		Collections.addAll(this.comparedValues, val1, val2);
-		this.sql = tf.getFullFieldName() + op1 + "?" + op2 + "?";
+		this.sql = tf.getFullQualification() + op1 + "?" + op2 + "?";
 	}
 
-	public <T> SqlCondition(DbTableField<T> tf1, SqlConditionOperator op1, DbTableField<T> tf2, SqlConditionOperator op2, DbTableField<T> tf3) {
-		this.sql = tf1.getFullFieldName() + op1 + tf2.getFullFieldName() + op2 + tf3;
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op1, DbComparableField<T> tf2, SqlConditionOperator op2, DbComparableField<T> tf3) {
+		this.sql = tf1.getFullQualification() + op1 + tf2.getFullQualification() + op2 + tf3;
 	}
 
-	public <T> SqlCondition(DbTableField<T> tf1, SqlConditionOperator op, List<T> values) {
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, List<T> values) {
 
 		StringBuilder valueString = new StringBuilder("(");
 		for (int i = 0; i < values.size(); i++) {
@@ -45,7 +46,12 @@ public class SqlCondition {
 			}
 		}
 		valueString.append(')');
-		this.sql = tf1.getFullFieldName() + op + valueString;
+		this.sql = tf1.getFullQualification() + op + valueString;
+	}
+
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, SqlScalarSubquery<T> subquery) {
+		this.comparedValues.addAll(subquery.getValues());
+		this.sql = tf1.getFullQualification() + op + "(" + subquery + ")";
 	}
 
 	public SqlCondition and(SqlCondition sqlCondition) {

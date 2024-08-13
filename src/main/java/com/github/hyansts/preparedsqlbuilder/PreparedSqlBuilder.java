@@ -8,6 +8,7 @@ import java.util.StringJoiner;
 
 import com.github.hyansts.preparedsqlbuilder.query.CombinableQuery;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQueryBuilder;
+import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
@@ -16,19 +17,19 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 
 class PreparedSqlBuilder implements SqlQueryBuilder {
 
+	protected final List<DbFieldLike> selectedFields = new ArrayList<>();
 	private final StringBuilder sql = new StringBuilder(128);
-	private final List<DbTableField<?>> selectedFields = new ArrayList<>();
 	private final List<Object> values = new ArrayList<>();
 	private boolean chainNextSetClause = false;
 
 	@Override
-	public SqlQueryBuilder select(DbTableField<?>... fields) {
+	public SqlQueryBuilder select(DbFieldLike... fields) {
 		this.sql.append(SELECT).append(chainFieldsDefinitions(fields));
 		return this;
 	}
 
 	@Override
-	public SqlQueryBuilder select(String expression, DbTableField<?>... fields) {
+	public SqlQueryBuilder select(String expression, DbFieldLike... fields) {
 		this.sql.append(SELECT).append(expression);
 		if (fields != null && fields.length > 0) {
 			this.sql.append(", ").append(chainFieldsDefinitions(fields));
@@ -37,13 +38,13 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder selectDistinct(DbTableField<?>... fields) {
+	public SqlQueryBuilder selectDistinct(DbFieldLike... fields) {
 		sql.append(SELECT).append(DISTINCT).append(chainFieldsDefinitions(fields));
 		return this;
 	}
 
 	@Override
-	public SqlQueryBuilder selectDistinct(String expression, DbTableField<?>... fields) {
+	public SqlQueryBuilder selectDistinct(String expression, DbFieldLike... fields) {
 		this.sql.append(SELECT).append(DISTINCT).append(expression);
 		if (fields != null && fields.length > 0) {
 			this.sql.append(", ").append(chainFieldsDefinitions(fields));
@@ -52,8 +53,8 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder selectCount(DbTableField<?> field) {
-		sql.append(SELECT).append(SqlAggregator.count(field.getFullFieldName()));
+	public SqlQueryBuilder selectCount(DbField field) {
+		sql.append(SELECT).append(SqlAggregator.count(field.getFullQualification()));
 		return this;
 	}
 
@@ -64,8 +65,8 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder from(DbTable table) {
-		this.sql.append(FROM).append(table.getTableNameDefinition());
+	public SqlQueryBuilder from(DbTableLike table) {
+		this.sql.append(FROM).append(table.getDefinition());
 		return this;
 	}
 
@@ -83,14 +84,14 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public <T> SqlQueryBuilder set(DbTableField<T> field, T value) {
+	public SqlQueryBuilder set(DbFieldValue<?> field) {
 		this.sql.append(this.chainNextSetClause ? ", " : SET).append(field.getFieldName()).append(EQ);
 		this.chainNextSetClause = true;
-		if (value == null) {
+		if (field.getValue() == null) {
 			this.sql.append("null");
 			return this;
 		}
-		this.values.add(value);
+		this.values.add(field.getValue());
 		this.sql.append('?');
 		return this;
 	}
@@ -108,18 +109,18 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder values(DbTableField<?>... fields) {
+	public SqlQueryBuilder values(DbFieldValue<?>... fields) {
 
 		StringJoiner joinedFields = new StringJoiner(", ", "(", ")");
 		StringJoiner joinedValues = new StringJoiner(", ", "(", ")");
 
 		for (var field : fields) {
 			joinedFields.add(field.getFieldName());
-			if (field.getInsertValue() == null) {
+			if (field.getValue() == null) {
 				joinedValues.add("null");
 				continue;
 			}
-			this.values.add(field.getInsertValue());
+			this.values.add(field.getValue());
 			joinedValues.add("?");
 		}
 		this.sql.append(joinedFields).append(VALUES).append(joinedValues);
@@ -127,32 +128,32 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder innerJoin(DbTable table) {
-		this.sql.append(INNER_JOIN).append(table.getTableNameDefinition());
+	public SqlQueryBuilder innerJoin(DbTableLike table) {
+		this.sql.append(INNER_JOIN).append(table.getDefinition());
 		return this;
 	}
 
 	@Override
-	public SqlQueryBuilder leftJoin(DbTable table) {
-		this.sql.append(LEFT_JOIN).append(table.getTableNameDefinition());
+	public SqlQueryBuilder leftJoin(DbTableLike table) {
+		this.sql.append(LEFT_JOIN).append(table.getDefinition());
 		return this;
 	}
 
 	@Override
-	public SqlQueryBuilder rightJoin(DbTable table) {
-		this.sql.append(RIGHT_JOIN).append(table.getTableNameDefinition());
+	public SqlQueryBuilder rightJoin(DbTableLike table) {
+		this.sql.append(RIGHT_JOIN).append(table.getDefinition());
 		return this;
 	}
 
 	@Override
-	public SqlQueryBuilder fullJoin(DbTable table) {
-		this.sql.append(FULL_JOIN).append(table.getTableNameDefinition());
+	public SqlQueryBuilder fullJoin(DbTableLike table) {
+		this.sql.append(FULL_JOIN).append(table.getDefinition());
 		return this;
 	}
 
 	@Override
-	public SqlQueryBuilder crossJoin(DbTable table) {
-		this.sql.append(CROSS_JOIN).append(table.getTableNameDefinition());
+	public SqlQueryBuilder crossJoin(DbTableLike table) {
+		this.sql.append(CROSS_JOIN).append(table.getDefinition());
 		return this;
 	}
 
@@ -164,10 +165,10 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder groupBy(DbTableField<?>... fields) {
+	public SqlQueryBuilder groupBy(DbField... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
-			joinedFields.add(field.getFullFieldName());
+			joinedFields.add(field.getFullQualification());
 		}
 		this.sql.append(GROUP_BY).append(joinedFields);
 		return this;
@@ -181,10 +182,10 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	}
 
 	@Override
-	public SqlQueryBuilder orderBy(DbTableField<?>... fields) {
+	public SqlQueryBuilder orderBy(DbFieldLike... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
-			joinedFields.add(field.getFieldLabel() + field.getSortOrder());
+			joinedFields.add(field.getLabel() + field.getSortOrder());
 		}
 		this.sql.append(ORDER_BY).append(joinedFields);
 		return this;
@@ -260,7 +261,7 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 		Object[] fieldsString = new String[this.selectedFields.size()];
 		int i = 0;
 		for (var field : this.selectedFields) {
-			fieldsString[i++] = field.getFieldNameDefinition();
+			fieldsString[i++] = field.getDefinition();
 		}
 		return String.format(this.sql.toString(), fieldsString);
 	}
@@ -268,12 +269,17 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	@Override
 	public String toString() { return getSql(); }
 
-	private String chainFieldsDefinitions(DbTableField<?>... fields) {
-		if (fields == null || fields.length == 0) { return "*"; }
+	private String chainFieldsDefinitions(DbFieldLike... fields) {
+		if (fields == null || fields.length == 0) {
+			return "*";
+		}
 		StringJoiner clause = new StringJoiner(", ");
 		for (var field : fields) {
 			this.selectedFields.add(field);
 			clause.add("%s");
+			if (field instanceof SqlScalarSubquery<?> subquery) {
+				this.values.addAll(subquery.getValues());
+			}
 		}
 		return clause.toString();
 	}

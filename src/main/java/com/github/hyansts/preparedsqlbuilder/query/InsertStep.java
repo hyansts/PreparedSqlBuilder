@@ -1,7 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbTableField;
+import com.github.hyansts.preparedsqlbuilder.DbFieldValue;
 
 public interface InsertStep {
-	PreparedSql values(DbTableField<?>... fields);
+	PreparedSql values(DbFieldValue<?>... fields);
 }

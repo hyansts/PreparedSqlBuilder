@@ -1,25 +1,26 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbTable;
-import com.github.hyansts.preparedsqlbuilder.DbTableField;
+import com.github.hyansts.preparedsqlbuilder.DbField;
+import com.github.hyansts.preparedsqlbuilder.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 public interface FromStep extends CombiningOperation {
 	WhereStep where(SqlCondition condition);
 
-	JoinStep innerJoin(DbTable table);
+	JoinStep innerJoin(DbTableLike table);
 
-	JoinStep leftJoin(DbTable table);
+	JoinStep leftJoin(DbTableLike table);
 
-	JoinStep rightJoin(DbTable table);
+	JoinStep rightJoin(DbTableLike table);
 
-	JoinStep fullJoin(DbTable table);
+	JoinStep fullJoin(DbTableLike table);
 
-	FromStep crossJoin(DbTable table);
+	FromStep crossJoin(DbTableLike table);
 
-	GroupByStep groupBy(DbTableField<?>... fields);
+	GroupByStep groupBy(DbField... fields);
 
-	OrderByStep orderBy(DbTableField<?>... fields);
+	OrderByStep orderBy(DbFieldLike... fields);
 
 	LimitStep limit(Integer number);
 }

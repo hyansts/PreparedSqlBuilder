@@ -180,7 +180,7 @@ class PreparedSqlBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.NAME, name)
+			 .set(tb.NAME.value(name))
 			 .where(tb.ID.eq(id));
 
 		String expectedSQL = "UPDATE employees SET name = ? WHERE id = ?";
@@ -201,9 +201,9 @@ class PreparedSqlBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.NAME, name)
-			 .set(tb.AGE, age)
-			 .set(tb.IS_ACTIVE, isActive)
+			 .set(tb.NAME.value(name))
+			 .set(tb.AGE.value(age))
+			 .set(tb.IS_ACTIVE.value(isActive))
 			 .where(tb.ID.eq(id));
 
 		String expectedSQL = "UPDATE employees SET name = ?, age = ?, is_active = ? WHERE id = ?";
@@ -221,7 +221,7 @@ class PreparedSqlBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.IS_ACTIVE, isActive);
+			 .set(tb.IS_ACTIVE.value(isActive));
 
 		String expected = "UPDATE employees SET is_active = ?";
 		List<Object> expectedValues = List.of(isActive);
@@ -471,4 +471,88 @@ class PreparedSqlBuilderTest {
 		assertEquals(expected, query.getSql());
 	}
 
+	@Test
+	public void testUnionAllClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery query2 = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .unionAll(query2.select()
+							 .from(dtb));
+
+		String expected = "SELECT * FROM employees UNION ALL SELECT * FROM department";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testExceptClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery query2 = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .except(query2.select()
+						   .from(dtb));
+
+		String expected = "SELECT * FROM employees EXCEPT SELECT * FROM department";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testExceptAllClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery query2 = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .exceptAll(query2.select()
+							  .from(dtb));
+
+		String expected = "SELECT * FROM employees EXCEPT ALL SELECT * FROM department";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testIntersectClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery query2 = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .intersect(query2.select()
+							  .from(dtb));
+
+		String expected = "SELECT * FROM employees INTERSECT SELECT * FROM department";
+		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testIntersectAllClause() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery query2 = SqlQueryFactory.createQuery();
+		query.select()
+			 .from(tb)
+			 .intersectAll(query2.select()
+								 .from(dtb));
+
+		String expected = "SELECT * FROM employees INTERSECT ALL SELECT * FROM department";
+		assertEquals(expected, query.getSql());
+	}
 }

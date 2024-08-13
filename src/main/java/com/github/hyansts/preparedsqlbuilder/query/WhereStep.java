@@ -1,11 +1,12 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbTableField;
+import com.github.hyansts.preparedsqlbuilder.DbField;
+import com.github.hyansts.preparedsqlbuilder.DbFieldLike;
 
 public interface WhereStep extends CombiningOperation {
-	GroupByStep groupBy(DbTableField<?>... fields);
+	GroupByStep groupBy(DbField... fields);
 
-	OrderByStep orderBy(DbTableField<?>... fields);
+	OrderByStep orderBy(DbFieldLike... fields);
 
 	LimitStep limit(Integer number);
 }

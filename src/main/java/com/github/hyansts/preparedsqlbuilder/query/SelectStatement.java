@@ -1,17 +1,18 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbTableField;
+import com.github.hyansts.preparedsqlbuilder.DbField;
+import com.github.hyansts.preparedsqlbuilder.DbFieldLike;
 
 public interface SelectStatement {
-	SelectStep select(DbTableField<?>... fields);
+	SelectStep select(DbFieldLike... fields);
 
-	SelectStep select(String expression, DbTableField<?>... fields);
+	SelectStep select(String expression, DbFieldLike... fields);
 
-	SelectStep selectDistinct(DbTableField<?>... fields);
+	SelectStep selectDistinct(DbFieldLike... fields);
 
-	SelectStep selectDistinct(String expression, DbTableField<?>... fields);
+	SelectStep selectDistinct(String expression, DbFieldLike... fields);
 
-	SelectStep selectCount(DbTableField<?> field);
+	SelectStep selectCount(DbField field);
 
 	SelectStep selectCount();
 }
