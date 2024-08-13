@@ -1,4 +1,4 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.db.impl;
 
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;

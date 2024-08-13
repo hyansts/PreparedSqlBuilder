@@ -1,10 +1,12 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.db.impl;
 
+import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
+import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
-public class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery, DbTableLike {
+class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery, DbTableLike {
 
 	private String alias;
 

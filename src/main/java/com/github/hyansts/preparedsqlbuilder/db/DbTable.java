@@ -1,4 +1,4 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.db;
 
 public interface DbTable extends DbTableLike {
 	String getTableName();

@@ -1,11 +1,13 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.db.impl;
 
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
-public class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements SqlScalarSubquery<T>, DbFieldLike {
+class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements SqlScalarSubquery<T>, DbFieldLike {
 
 	private String alias;
 	private String fullQualification;

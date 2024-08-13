@@ -1,5 +1,6 @@
 package com.github.hyansts.preparedsqlbuilder;
 
+import com.github.hyansts.preparedsqlbuilder.db.impl.SqlStringBuilder;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 
 import org.junit.jupiter.api.Test;

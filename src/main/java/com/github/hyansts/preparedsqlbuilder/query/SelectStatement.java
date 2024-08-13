@@ -1,7 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbField;
-import com.github.hyansts.preparedsqlbuilder.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbField;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 
 public interface SelectStatement {
 	SelectStep select(DbFieldLike... fields);

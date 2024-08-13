@@ -1,6 +1,6 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 public interface GroupByStep extends CombiningOperation {

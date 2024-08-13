@@ -1,4 +1,4 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.db.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import com.github.hyansts.preparedsqlbuilder.db.DbField;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
+import com.github.hyansts.preparedsqlbuilder.db.DbTable;
+import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.query.CombinableQuery;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQueryBuilder;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;

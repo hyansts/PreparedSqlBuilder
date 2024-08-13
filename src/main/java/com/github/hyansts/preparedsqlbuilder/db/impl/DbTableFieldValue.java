@@ -1,4 +1,6 @@
-package com.github.hyansts.preparedsqlbuilder;
+package com.github.hyansts.preparedsqlbuilder.db.impl;
+
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
 
 public class DbTableFieldValue<T> implements DbFieldValue<T> {
 

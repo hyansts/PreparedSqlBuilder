@@ -1,6 +1,6 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbFieldValue;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 public interface SetStep extends PreparedSql {

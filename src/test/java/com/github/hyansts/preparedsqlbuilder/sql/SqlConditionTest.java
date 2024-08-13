@@ -2,7 +2,7 @@ package com.github.hyansts.preparedsqlbuilder.sql;
 
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.DbTableField;
+import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 
 import org.junit.jupiter.api.Test;
 

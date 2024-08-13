@@ -1,8 +1,8 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.DbField;
-import com.github.hyansts.preparedsqlbuilder.DbFieldLike;
-import com.github.hyansts.preparedsqlbuilder.DbTableLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbField;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 public interface FromStep extends CombiningOperation {

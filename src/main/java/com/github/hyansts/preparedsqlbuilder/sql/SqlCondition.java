@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.DbComparableField;
+import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 
 public class SqlCondition {
