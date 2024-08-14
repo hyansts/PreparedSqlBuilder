@@ -2,6 +2,7 @@ package com.github.hyansts.preparedsqlbuilder;
 
 import java.util.List;
 
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 import com.github.hyansts.preparedsqlbuilder.db.impl.SqlQueryFactory;
@@ -28,6 +29,7 @@ class PreparedSqlBuilderTest {
 
 		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
 		public final DbTableField<String> TITLE = new DbTableField<>("title", this);
+		public final DbTableField<Integer> ADMIN_ID = new DbTableField<>("admin_id", this);
 
 		public DepartmentDbTable() { super("department"); }
 	}
@@ -557,5 +559,58 @@ class PreparedSqlBuilderTest {
 
 		String expected = "SELECT * FROM employees INTERSECT ALL SELECT * FROM department";
 		assertEquals(expected, query.getSql());
+	}
+
+	@Test
+	public void testFullQuery() {
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlQuery unionQuery = SqlQueryFactory.createQuery();
+
+		EmployeesDbTable etb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		final boolean isActive = true;
+		final int age = 30;
+		final String title = "A%";
+		final int departmentId = 10;
+
+		DbFieldLike emp_count = etb.ID.count().as("emp_count");
+
+		query.select(emp_count, dtb.TITLE.as("dep_name"))
+			 .from(etb.as("emp"))
+			 .innerJoin(dtb.as("dep"))
+			 .on(etb.DEPARTMENT_ID.eq(dtb.ID))
+			 .where(etb.IS_ACTIVE.eq(isActive).and(etb.AGE.gt(age).or(dtb.ADMIN_ID.eq(etb.ID))))
+			 .groupBy(dtb.TITLE)
+			 .having(dtb.TITLE.like(title))
+			 .limit(10)
+			 .offset(3)
+			 .union(unionQuery.select(etb.ID.max(), dtb.TITLE.as("dep_name"))
+							  .from(etb.as("uemp"))
+							  .innerJoin(dtb.as("udep"))
+							  .on(etb.DEPARTMENT_ID.eq(dtb.ID))
+							  .where(dtb.ID.gt(departmentId))
+							  .groupBy(dtb.TITLE))
+			 .orderBy(emp_count.desc());
+
+		String expectedSQL = "SELECT COUNT(emp.id) AS emp_count, dep.title AS dep_name " +
+									 "FROM employees AS emp " +
+									 "INNER JOIN department AS dep " +
+									 "ON emp.department_id = dep.id " +
+									 "WHERE emp.is_active = ? AND (emp.age > ? OR dep.admin_id = emp.id) " +
+									 "GROUP BY dep.title HAVING dep.title LIKE ? " +
+									 "LIMIT 10 OFFSET 3 " +
+									 "UNION " +
+									 "SELECT MAX(uemp.id), udep.title AS dep_name " +
+									 "FROM employees AS uemp " +
+									 "INNER JOIN department AS udep " +
+									 "ON uemp.department_id = udep.id " +
+									 "WHERE udep.id > ? " +
+									 "GROUP BY udep.title " +
+									 "ORDER BY emp_count DESC";
+
+		assertEquals(expectedSQL, query.getSql());
+		assertEquals(List.of(isActive, age, title, departmentId), query.getValues());
 	}
 }

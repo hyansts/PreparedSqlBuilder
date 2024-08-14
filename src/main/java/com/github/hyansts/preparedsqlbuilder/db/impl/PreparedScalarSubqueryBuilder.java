@@ -10,19 +10,19 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements SqlScalarSubquery<T>, DbFieldLike {
 
 	private String alias;
-	private String fullQualification;
-	private SqlSortOrder sortOrder = SqlSortOrder.ASC;
+	private DbTableLike tableLike;
+	private SqlSortOrder sortOrder;
 
 	public PreparedScalarSubqueryBuilder() { }
 
-	public PreparedScalarSubqueryBuilder(String fullQualification) {
-		this.fullQualification = fullQualification;
+	public PreparedScalarSubqueryBuilder(DbTableLike tableLike) {
+		this.tableLike = tableLike;
 	}
 
 	@Override
 	public String getFullQualification() {
-		return this.fullQualification == null || this.fullQualification.isBlank()
-					   ? "(" + this.getSql() + ")" : this.fullQualification;
+		return this.tableLike == null || this.tableLike.getAlias() == null || tableLike.getAlias().isBlank()
+					   ? "(" + this.getSql() + ")" : this.tableLike.getAlias() + "." + this.getLabel();
 	}
 
 	@Override
@@ -37,6 +37,11 @@ class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements Sql
 			throw new IllegalStateException("Cannot reference a subquery with an empty alias: " + getDefinition());
 		}
 		return this.alias;
+	}
+
+	@Override
+	public DbTableLike getTableLike() {
+		return tableLike;
 	}
 
 	@Override
@@ -62,7 +67,7 @@ class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements Sql
 
 	@Override
 	public PreparedScalarSubqueryBuilder<T> mapTo(DbTableLike tableLike) {
-		return new PreparedScalarSubqueryBuilder<>(tableLike.getAlias() + "." + this.getLabel());
+		return new PreparedScalarSubqueryBuilder<>(tableLike);
 	}
 
 }

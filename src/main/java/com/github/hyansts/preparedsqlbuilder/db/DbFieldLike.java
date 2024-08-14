@@ -9,6 +9,8 @@ public interface DbFieldLike {
 
 	String getLabel();
 
+	DbTableLike getTableLike();
+
 	DbComparableField<?> mapTo(DbTableLike tableLike);
 
 	SqlSortOrder getSortOrder();

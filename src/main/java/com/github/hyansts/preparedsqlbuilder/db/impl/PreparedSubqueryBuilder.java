@@ -6,6 +6,7 @@ import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
+//TODO remove possibility to insert/update/delete with subqueries
 class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery, DbTableLike {
 
 	private String alias;
@@ -13,7 +14,7 @@ class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery,
 	@Override
 	public String getAlias() {
 		if (this.alias == null || this.alias.isBlank()) {
-			throw new IllegalStateException("Cannot reference a subquery with an empty alias: " + getDefinition());
+			throw new IllegalStateException("Cannot reference a subquery with an empty alias: " + this.getSql());
 		}
 		return this.alias;
 	}
@@ -21,7 +22,7 @@ class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery,
 	@Override
 	public String getDefinition() {
 		if (this.alias == null || this.alias.isBlank()) {
-			throw new IllegalStateException("Cannot leave a derived table subquery with an empty alias: " + getDefinition());
+			throw new IllegalStateException("Cannot leave a derived table subquery with an empty alias: " + this.getSql());
 		}
 		return "(" + this.getSql() + ")" + AS + this.alias;
 	}

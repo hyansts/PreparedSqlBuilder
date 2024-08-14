@@ -16,6 +16,7 @@ import com.github.hyansts.preparedsqlbuilder.query.SqlQueryBuilder;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
+import com.github.hyansts.preparedsqlbuilder.util.StringTemplateFormatter;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.EQ;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
@@ -72,6 +73,7 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	@Override
 	public SqlQueryBuilder from(DbTableLike table) {
 		this.sql.append(FROM).append(table.getDefinition());
+		processFieldDefinition(table);
 		return this;
 	}
 
@@ -135,30 +137,35 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	@Override
 	public SqlQueryBuilder innerJoin(DbTableLike table) {
 		this.sql.append(INNER_JOIN).append(table.getDefinition());
+		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder leftJoin(DbTableLike table) {
 		this.sql.append(LEFT_JOIN).append(table.getDefinition());
+		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder rightJoin(DbTableLike table) {
 		this.sql.append(RIGHT_JOIN).append(table.getDefinition());
+		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder fullJoin(DbTableLike table) {
 		this.sql.append(FULL_JOIN).append(table.getDefinition());
+		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
 	public SqlQueryBuilder crossJoin(DbTableLike table) {
 		this.sql.append(CROSS_JOIN).append(table.getDefinition());
+		processFieldDefinition(table);
 		return this;
 	}
 
@@ -190,7 +197,8 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 	public SqlQueryBuilder orderBy(DbFieldLike... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
-			joinedFields.add(field.getLabel() + field.getSortOrder());
+			String sortOrder = field.getSortOrder() != null ? field.getSortOrder().toString() : "";
+			joinedFields.add(field.getLabel() + sortOrder);
 		}
 		this.sql.append(ORDER_BY).append(joinedFields);
 		return this;
@@ -263,12 +271,7 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 
 	@Override
 	public String getSql() {
-		Object[] fieldsString = new String[this.selectedFields.size()];
-		int i = 0;
-		for (var field : this.selectedFields) {
-			fieldsString[i++] = field.getDefinition();
-		}
-		return String.format(this.sql.toString(), fieldsString);
+		return this.sql.toString();
 	}
 
 	@Override
@@ -279,14 +282,30 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 			return "*";
 		}
 		StringJoiner clause = new StringJoiner(", ");
-		for (var field : fields) {
-			this.selectedFields.add(field);
-			clause.add("%s");
-			if (field instanceof SqlScalarSubquery<?> subquery) {
+		for (int i = 0; i < fields.length; i++) {
+			this.selectedFields.add(fields[i]);
+			if (fields[i] instanceof SqlScalarSubquery<?> subquery) {
 				this.values.addAll(subquery.getValues());
+				clause.add(subquery.getDefinition());
+			} else {
+				clause.add("${" + i + "}");
 			}
 		}
 		return clause.toString();
+	}
+
+	private void processFieldDefinition(DbTableLike tableLike) {
+		StringTemplateFormatter formatter = new StringTemplateFormatter();
+		int i = 0;
+		for (var field : this.selectedFields) {
+			if (field.getTableLike() == tableLike) {
+				formatter.put(i, field.getDefinition());
+			}
+			i++;
+		}
+		String formattedSql = formatter.format(this.sql.toString());
+		this.sql.delete(0, this.sql.length());
+		this.sql.append(formattedSql);
 	}
 
 }
