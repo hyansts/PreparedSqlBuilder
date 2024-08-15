@@ -296,10 +296,9 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 
 	private void processFieldDefinition(DbTableLike tableLike) {
 		StringTemplateFormatter formatter = new StringTemplateFormatter();
-		int i = 0;
-		for (var field : this.selectedFields) {
-			if (field.getTableLike() == tableLike) {
-				formatter.put(String.valueOf(i++), field.getDefinition());
+		for (int i = 0; i < this.selectedFields.size(); i++) {
+			if (this.selectedFields.get(i).getTableLike() == tableLike) {
+				formatter.put(Integer.toString(i), this.selectedFields.get(i).getDefinition());
 			}
 		}
 		String formattedSql = formatter.format(this.sql.toString());
