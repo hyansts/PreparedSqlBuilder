@@ -1,5 +1,6 @@
 package com.github.hyansts.preparedsqlbuilder.sql;
 
+//TODO write tests
 public class SqlScalar {
 
 	private SqlScalar() { }

@@ -5,8 +5,8 @@ import java.util.List;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
-import com.github.hyansts.preparedsqlbuilder.db.impl.SqlQueryFactory;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
+import com.github.hyansts.preparedsqlbuilder.query.impl.SqlQueryFactory;
 
 import org.junit.jupiter.api.Test;
 

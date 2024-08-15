@@ -1,4 +1,4 @@
-package com.github.hyansts.preparedsqlbuilder.db.impl;
+package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
