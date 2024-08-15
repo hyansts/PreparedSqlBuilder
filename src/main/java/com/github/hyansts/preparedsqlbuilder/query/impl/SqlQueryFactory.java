@@ -6,13 +6,14 @@ import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 
 public abstract class SqlQueryFactory {
 	public static SqlQuery createQuery() {
-		return new PreparedSqlBuilder();
+		return new SqlQueryBuilder();
 	}
+
 	public static SqlSubquery createSubquery() {
-		return new PreparedSubqueryBuilder();
+		return new SqlSubqueryBuilder();
 	}
 
 	public static <T> SqlScalarSubquery<T> createScalarSubquery() {
-		return new PreparedScalarSubqueryBuilder<>();
+		return new SqlScalarSubqueryBuilder<>();
 	}
 }

@@ -28,7 +28,7 @@ public class SqlScalar {
 
 	// :: For null values
 	public static String nullif(String field1, String field2) { return format("NULLIF", field1, field2); }
-	public static String coalesce(String... fields) { return format("COALESCE)", fields); }
+	public static String coalesce(String... fields) { return format("COALESCE", fields); }
 
 	// :: Format helpers
 	private static String format(String str, String arg) {

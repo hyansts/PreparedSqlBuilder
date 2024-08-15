@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbField;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbWritableField;
@@ -53,19 +54,19 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	}
 
 	@Override
-	public DbTableField<T> asc() {
+	public DbFieldLike asc() {
 		this.sortOrder = SqlSortOrder.ASC;
 		return this;
 	}
 
 	@Override
-	public DbTableField<T> desc() {
+	public DbFieldLike desc() {
 		this.sortOrder = SqlSortOrder.DESC;
 		return this;
 	}
 
 	@Override
-	public DbTableField<T> as(String alias) {
+	public DbFieldLike as(String alias) {
 		this.alias = alias;
 		return this;
 	}

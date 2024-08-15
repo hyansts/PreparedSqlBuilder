@@ -49,6 +49,7 @@ public class SqlCondition {
 		this.sql = tf1.getFullQualification() + op + valueString;
 	}
 
+	//TODO test if this is necessary (SqlScalarSubquery already implements DbComparableField) and test parenthesis
 	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, SqlScalarSubquery<T> subquery) {
 		this.comparedValues.addAll(subquery.getValues());
 		this.sql = tf1.getFullQualification() + op + "(" + subquery + ")";
@@ -74,8 +75,8 @@ public class SqlCondition {
 		return otherCondition.getSql();
 	}
 
-	public List<Object> getComparedValues() { return comparedValues; }
-	public String getSql() { return sql; }
+	public List<Object> getComparedValues() { return this.comparedValues; }
+	public String getSql() { return this.sql; }
 
 	@Override
 	public String toString() {

@@ -1,21 +1,23 @@
 package com.github.hyansts.preparedsqlbuilder.query.impl;
 
+import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
+import com.github.hyansts.preparedsqlbuilder.query.SelectQuerySteps;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
-class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements SqlScalarSubquery<T>, DbFieldLike {
+class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder implements SqlScalarSubquery<T>, SelectQuerySteps {
 
 	private String alias;
 	private DbTableLike tableLike;
 	private SqlSortOrder sortOrder;
 
-	public PreparedScalarSubqueryBuilder() { }
+	public SqlScalarSubqueryBuilder() { }
 
-	public PreparedScalarSubqueryBuilder(DbTableLike tableLike) {
+	public SqlScalarSubqueryBuilder(DbTableLike tableLike) {
 		this.tableLike = tableLike;
 	}
 
@@ -45,19 +47,19 @@ class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements Sql
 	}
 
 	@Override
-	public PreparedScalarSubqueryBuilder<T> as(String alias) {
+	public DbFieldLike as(String alias) {
 		this.alias = alias;
 		return this;
 	}
 
 	@Override
-	public PreparedScalarSubqueryBuilder<T> asc() {
+	public DbFieldLike asc() {
 		this.sortOrder = SqlSortOrder.ASC;
 		return this;
 	}
 
 	@Override
-	public PreparedScalarSubqueryBuilder<T> desc() {
+	public DbFieldLike desc() {
 		this.sortOrder = SqlSortOrder.DESC;
 		return this;
 	}
@@ -66,8 +68,8 @@ class PreparedScalarSubqueryBuilder<T> extends PreparedSqlBuilder implements Sql
 	public SqlSortOrder getSortOrder() { return sortOrder; }
 
 	@Override
-	public PreparedScalarSubqueryBuilder<T> mapTo(DbTableLike tableLike) {
-		return new PreparedScalarSubqueryBuilder<>(tableLike);
+	public DbComparableField<T> mapTo(DbTableLike tableLike) {
+		return new SqlScalarSubqueryBuilder<>(tableLike);
 	}
 
 }

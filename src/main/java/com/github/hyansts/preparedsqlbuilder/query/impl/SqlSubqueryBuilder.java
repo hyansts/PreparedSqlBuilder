@@ -2,12 +2,12 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
+import com.github.hyansts.preparedsqlbuilder.query.SelectQuerySteps;
 import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
-//TODO remove possibility to insert/update/delete with subqueries
-class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery, DbTableLike {
+class SqlSubqueryBuilder extends BaseSqlBuilder implements SqlSubquery, SelectQuerySteps {
 
 	private String alias;
 
@@ -28,7 +28,7 @@ class PreparedSubqueryBuilder extends PreparedSqlBuilder implements SqlSubquery,
 	}
 
 	@Override
-	public PreparedSubqueryBuilder as(String alias) {
+	public DbTableLike as(String alias) {
 		this.alias = alias;
 		return this;
 	}

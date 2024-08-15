@@ -7,6 +7,7 @@ import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.EQ;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 
+//TODO: implement missing methods that are present in the BaseSqlBuilder
 public class SqlStringBuilder {
 
 	private final StringBuilder sql = new StringBuilder(128);

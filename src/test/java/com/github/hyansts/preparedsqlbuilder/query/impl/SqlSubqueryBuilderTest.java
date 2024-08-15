@@ -1,8 +1,11 @@
-package com.github.hyansts.preparedsqlbuilder.db.impl;
+package com.github.hyansts.preparedsqlbuilder.query.impl;
+
+import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
+import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 
 import org.junit.jupiter.api.Test;
 
-public class PreparedSubqueryBuilderTest {
+public class SqlSubqueryBuilderTest {
 
 	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 
