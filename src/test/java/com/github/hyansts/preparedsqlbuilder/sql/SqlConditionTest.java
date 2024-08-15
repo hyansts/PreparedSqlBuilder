@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SqlConditionTest {
+public class SqlConditionTest {
 
 	@Test
-	void testAndField() {
+	public void testAndField() {
 		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
 		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
 		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
@@ -26,7 +26,7 @@ class SqlConditionTest {
 	}
 
 	@Test
-	void testOrField() {
+	public void testOrField() {
 		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
 		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
 		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
@@ -41,7 +41,7 @@ class SqlConditionTest {
 	}
 
 	@Test
-	void testAndNested() {
+	public void testAndNested() {
 		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
 		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
 		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
@@ -61,7 +61,7 @@ class SqlConditionTest {
 	}
 
 	@Test
-	void testOrNested() {
+	public void testOrNested() {
 		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
 		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
 		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
@@ -81,7 +81,7 @@ class SqlConditionTest {
 	}
 
 	@Test
-	void testAndOR() {
+	public void testAndOR() {
 		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
 		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
 		DbTableField<Integer> field3 = new DbTableField<>("field3", null);

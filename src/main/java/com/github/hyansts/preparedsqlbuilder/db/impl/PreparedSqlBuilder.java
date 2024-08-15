@@ -299,9 +299,8 @@ class PreparedSqlBuilder implements SqlQueryBuilder {
 		int i = 0;
 		for (var field : this.selectedFields) {
 			if (field.getTableLike() == tableLike) {
-				formatter.put(i, field.getDefinition());
+				formatter.put(String.valueOf(i++), field.getDefinition());
 			}
-			i++;
 		}
 		String formattedSql = formatter.format(this.sql.toString());
 		this.sql.delete(0, this.sql.length());

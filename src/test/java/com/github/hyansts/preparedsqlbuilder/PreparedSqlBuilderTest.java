@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class PreparedSqlBuilderTest {
+public class PreparedSqlBuilderTest {
 
 	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 

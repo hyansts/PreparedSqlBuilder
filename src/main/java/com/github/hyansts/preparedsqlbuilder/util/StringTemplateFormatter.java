@@ -1,11 +1,19 @@
 package com.github.hyansts.preparedsqlbuilder.util;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
+/**
+ * StringTemplateFormatter is a utility class that allows custom templates with named placeholders that can be formatted
+ * at any order.
+ * <p>
+ * Placeholders are identified by a string key surrounded by the prefix and suffix provided in the
+ * constructor, if not, they are assumed to be <code>"${"</code> and <code>"}"</code> by default. A placeholder can be provided using
+ * {@link #put(String, Object)} or {@link #putAll(Map)}, and can be put in place using {@link #format(String)}.
+ */
 public class StringTemplateFormatter {
 
-	private final Map<Integer, String> placeHolders = new TreeMap<>();
+	private final Map<String, Object> placeHolders = new HashMap<>();
 	private final String prefix;
 	private final String suffix;
 
@@ -19,23 +27,23 @@ public class StringTemplateFormatter {
 	}
 
 	/**
-	 * Inserts a new key-value pair for the placeholder. The key must be the same integer used in between the prefix and
+	 * Inserts a new key-value pair for the placeholder. The key must be the same string used in between the prefix and
 	 * suffix pattern in the template.
 	 *
 	 * @param key   the key used to identify the placeholder.
 	 * @param value the value used to replace the placeholder.
 	 */
-	public void put(int key, String value) {
+	public void put(String key, Object value) {
 		placeHolders.put(key, value);
 	}
 
 	/**
-	 * Adds all the key-value pairs from the provided map to the placeholders map. The key must be the same integer used
-	 * in between the prefix and suffix pattern in the template
+	 * Adds all the key-value pairs from the provided map to the placeholders map. The key must be the same string used
+	 * in between the prefix and suffix pattern in the template.
 	 *
 	 * @param values the map containing key-value pairs for the placeholders.
 	 */
-	public void putAll(Map<Integer, String> values) {
+	public void putAll(Map<String, Object> values) {
 		this.placeHolders.putAll(values);
 	}
 
@@ -45,45 +53,55 @@ public class StringTemplateFormatter {
 	public void clear() {
 		this.placeHolders.clear();
 	}
+
 	/**
-	 * Formats a given template string by replacing placeholders with actual values. The placeholders are identified by
-	 * the prefix and suffix provided in the constructor, if not provided they are assumed to be ${ and } by default.
+	 * Formats a given template by replacing placeholders with actual values. Placeholders are identified by a
+	 * string key surrounded by the prefix and suffix provided in the constructor, if not provided they are assumed to
+	 * be <code>"${"</code> and <code>"}"</code> by default.
 	 * <p>
-	 * A placeholder is identified by the integer key provided through {@link #put(int, String)} or {@link #putAll(Map)}
-	 * methods, they can also be repeated multiple times in the template and placed in any order. Placeholders that
-	 * haven't been mapped to any value are ignored.
+	 * A placeholders can be provided through {@link #put(String, Object)} or {@link #putAll(Map)}, they can be repeated
+	 * multiple times in the template and placed in any order. Placeholders that haven't been mapped to any value are
+	 * ignored.
 	 * <p>
 	 * Previously mapped placeholder values will be preserved in between method calls, this method will try to apply
 	 * them to every template unless {@link #clear()} is called.
+	 * <p>
+	 * Example:
+	 * <pre>
+	 * {@code
+	 * StringTemplateFormatter formatter = new StringTemplateFormatter();
+	 * formatter.put("fruit", "Apple");
+	 * formatter.put("name", "John");
+	 * formatter.format("Example: ${fruit}, ${number}, ${name}");//"Example: Apple, ${number}, John"
+	 * }
+	 * </pre>
 	 *
-	 * @param template the template string to be formatted
-	 * @return the formatted string with the mapped placeholders replaced
+	 * @param template the template string to be formatted.
+	 * @return the formatted string with the mapped placeholders replaced.
 	 */
 	public String format(String template) {
-		StringBuilder stringBuilder = new StringBuilder(template);
+		StringBuilder sb = new StringBuilder();
 
-		TreeMap<Integer, Integer> indexes = new TreeMap<>();
-
-		for (Integer key : this.placeHolders.keySet()) {
-			String param = getPlaceholder(key);
-			int index = stringBuilder.indexOf(param);
-			while (index != -1) {
-				indexes.put(index, key);
-				index = stringBuilder.indexOf(param, index + param.length());
+		int lastIndex = 0;
+		int prefixIndex = template.indexOf(this.prefix);
+		int suffixIndex = template.indexOf(this.suffix, prefixIndex + this.prefix.length());
+		while (prefixIndex != -1 && suffixIndex != -1) {
+			String key = template.substring(prefixIndex + this.prefix.length(), suffixIndex);
+			Object val = this.placeHolders.get(key);
+			if (val != null) {
+				sb.append(template, lastIndex, prefixIndex).append(val);
+				lastIndex = suffixIndex + this.suffix.length();
 			}
+			prefixIndex = template.indexOf(this.prefix, suffixIndex + this.suffix.length());
+			suffixIndex = template.indexOf(this.suffix, prefixIndex + this.prefix.length());
 		}
 
-		for (var entry : indexes.descendingMap().entrySet()) {
-			int index = entry.getKey();
-			int key = entry.getValue();
-			stringBuilder.replace(index, index + getPlaceholder(key).length(), this.placeHolders.get(key));
+		if (lastIndex < template.length()) {
+			// append the rest of the template after the last placeholder
+			sb.append(template, lastIndex, template.length());
 		}
 
-		return stringBuilder.toString();
-	}
-
-	private String getPlaceholder(int key) {
-		return this.prefix + key + this.suffix;
+		return sb.toString();
 	}
 
 }

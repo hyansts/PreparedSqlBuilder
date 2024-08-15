@@ -2,7 +2,7 @@ package com.github.hyansts.preparedsqlbuilder.db.impl;
 
 import org.junit.jupiter.api.Test;
 
-class PreparedSubqueryBuilderTest {
+public class PreparedSubqueryBuilderTest {
 
 	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 
@@ -25,17 +25,17 @@ class PreparedSubqueryBuilderTest {
 	}
 
 	@Test
-	void testDerivedTableSubquery() {
+	public void testDerivedTableSubquery() {
 		//TODO
 	}
 
 	@Test
-	void testSelectWithSubquery() {
+	public void testSelectWithSubquery() {
 		//TODO
 	}
 
 	@Test
-	void testConditionalSubquery() {
+	public void testConditionalSubquery() {
 		//TODO
 	}
 }
