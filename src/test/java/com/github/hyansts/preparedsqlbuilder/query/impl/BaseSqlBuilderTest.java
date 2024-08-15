@@ -15,20 +15,20 @@ public class BaseSqlBuilderTest {
 
 	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 
-		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
-		public final DbTableField<String> NAME = new DbTableField<>("name", this);
-		public final DbTableField<Integer> AGE = new DbTableField<>("age", this);
-		public final DbTableField<Boolean> IS_ACTIVE = new DbTableField<>("is_active", this);
-		public final DbTableField<Integer> DEPARTMENT_ID = new DbTableField<>("department_id", this);
+		public final DbTableField<Integer> id = new DbTableField<>("id", this);
+		public final DbTableField<String> name = new DbTableField<>("name", this);
+		public final DbTableField<Integer> age = new DbTableField<>("age", this);
+		public final DbTableField<Boolean> is_active = new DbTableField<>("is_active", this);
+		public final DbTableField<Integer> department_id = new DbTableField<>("department_id", this);
 
 		public EmployeesDbTable() { super("employees"); }
 	}
 
 	private static class DepartmentDbTable extends BaseDbTable<DepartmentDbTable> {
 
-		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
-		public final DbTableField<String> TITLE = new DbTableField<>("title", this);
-		public final DbTableField<Integer> ADMIN_ID = new DbTableField<>("admin_id", this);
+		public final DbTableField<Integer> id = new DbTableField<>("id", this);
+		public final DbTableField<String> title = new DbTableField<>("title", this);
+		public final DbTableField<Integer> admin_id = new DbTableField<>("admin_id", this);
 
 		public DepartmentDbTable() { super("department"); }
 	}
@@ -41,9 +41,9 @@ public class BaseSqlBuilderTest {
 		final String name = "John Doe";
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(tb.ID)
+		query.select(tb.id)
 			 .from(tb)
-			 .where(tb.NAME.eq(name));
+			 .where(tb.name.eq(name));
 
 		String expectedSQL = "SELECT id FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
@@ -59,9 +59,9 @@ public class BaseSqlBuilderTest {
 		final String name = "John Doe";
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.selectDistinct(tb.ID)
+		query.selectDistinct(tb.id)
 			 .from(tb)
-			 .where(tb.NAME.eq(name));
+			 .where(tb.name.eq(name));
 
 		String expectedSQL = "SELECT DISTINCT id FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
@@ -79,7 +79,7 @@ public class BaseSqlBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.selectCount()
 			 .from(tb)
-			 .where(tb.NAME.eq(name));
+			 .where(tb.name.eq(name));
 
 		String expectedSQL = "SELECT COUNT(*) FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
@@ -95,9 +95,9 @@ public class BaseSqlBuilderTest {
 		final String name = "John Doe";
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.selectCount(tb.ID)
+		query.selectCount(tb.id)
 			 .from(tb)
-			 .where(tb.NAME.eq(name));
+			 .where(tb.name.eq(name));
 
 		String expectedSQL = "SELECT COUNT(id) FROM employees WHERE name = ?";
 		List<Object> expectedValues = List.of(name);
@@ -115,11 +115,11 @@ public class BaseSqlBuilderTest {
 		final int age = 30;
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(tb.ID, tb.NAME, tb.AGE)
+		query.select(tb.id, tb.name, tb.age)
 			 .from(tb.as("e"))
-			 .where(tb.IS_ACTIVE.eq(isActive)
-								.and(tb.NAME.eq(name))
-								.and(tb.AGE.eq(age)));
+			 .where(tb.is_active.eq(isActive)
+								.and(tb.name.eq(name))
+								.and(tb.age.eq(age)));
 
 		String expectedSQL =
 				"SELECT e.id, e.name, e.age FROM employees AS e WHERE e.is_active = ? AND e.name = ? AND e.age = ?";
@@ -138,10 +138,10 @@ public class BaseSqlBuilderTest {
 		final int age = 30;
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(expression, tb.ID, tb.NAME, tb.AGE)
+		query.select(expression, tb.id, tb.name, tb.age)
 			 .from(tb.as("e"))
-			 .where(tb.NAME.eq(name)
-						   .and(tb.AGE.eq(age)));
+			 .where(tb.name.eq(name)
+						   .and(tb.age.eq(age)));
 
 		String expectedSQL =
 				"SELECT CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END, " +
@@ -161,10 +161,10 @@ public class BaseSqlBuilderTest {
 		final int age = 30;
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.selectDistinct(expression, tb.ID, tb.NAME, tb.AGE)
+		query.selectDistinct(expression, tb.id, tb.name, tb.age)
 			 .from(tb.as("e"))
-			 .where(tb.NAME.eq(name)
-						   .and(tb.AGE.eq(age)));
+			 .where(tb.name.eq(name)
+						   .and(tb.age.eq(age)));
 
 		String expectedSQL =
 				"SELECT DISTINCT CASE WHEN e.IS_ACTIVE = true THEN 'USER IS ACTIVE' ELSE 'USER IS INACTIVE' END, " +
@@ -186,8 +186,8 @@ public class BaseSqlBuilderTest {
 		query.select()
 			 .from(tb.as("e"))
 			 .innerJoin(dtb.as("d"))
-			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
-			 .where(dtb.TITLE.eq(title));
+			 .on(tb.department_id.eq(dtb.id))
+			 .where(dtb.title.eq(title));
 
 		String expected =
 				"SELECT * FROM employees AS e INNER JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
@@ -208,8 +208,8 @@ public class BaseSqlBuilderTest {
 		query.select()
 			 .from(tb.as("e"))
 			 .leftJoin(dtb.as("d"))
-			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
-			 .where(dtb.TITLE.eq(title));
+			 .on(tb.department_id.eq(dtb.id))
+			 .where(dtb.title.eq(title));
 		String expected =
 				"SELECT * FROM employees AS e LEFT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
@@ -229,8 +229,8 @@ public class BaseSqlBuilderTest {
 		query.select()
 			 .from(tb.as("e"))
 			 .rightJoin(dtb.as("d"))
-			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
-			 .where(dtb.TITLE.eq(title));
+			 .on(tb.department_id.eq(dtb.id))
+			 .where(dtb.title.eq(title));
 
 		String expected =
 				"SELECT * FROM employees AS e RIGHT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
@@ -251,8 +251,8 @@ public class BaseSqlBuilderTest {
 		query.select()
 			 .from(tb.as("e"))
 			 .fullJoin(dtb.as("d"))
-			 .on(tb.DEPARTMENT_ID.eq(dtb.ID))
-			 .where(dtb.TITLE.eq(title));
+			 .on(tb.department_id.eq(dtb.id))
+			 .where(dtb.title.eq(title));
 
 		String expected =
 				"SELECT * FROM employees AS e FULL JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
@@ -273,7 +273,7 @@ public class BaseSqlBuilderTest {
 		query.select()
 			 .from(tb.as("e"))
 			 .crossJoin(dtb.as("d"))
-			 .where(dtb.TITLE.eq(title));
+			 .where(dtb.title.eq(title));
 
 		String expected =
 				"SELECT * FROM employees AS e CROSS JOIN department AS d WHERE d.title = ?";
@@ -288,9 +288,9 @@ public class BaseSqlBuilderTest {
 		EmployeesDbTable tb = new EmployeesDbTable();
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(tb.DEPARTMENT_ID, tb.AGE, tb.ID.count())
+		query.select(tb.department_id, tb.age, tb.id.count())
 			 .from(tb)
-			 .groupBy(tb.DEPARTMENT_ID, tb.AGE);
+			 .groupBy(tb.department_id, tb.age);
 
 		String expected = "SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age";
 		assertEquals(expected, query.getSql());
@@ -304,10 +304,10 @@ public class BaseSqlBuilderTest {
 		final int age = 30;
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(tb.DEPARTMENT_ID, tb.AGE, tb.ID.count())
+		query.select(tb.department_id, tb.age, tb.id.count())
 			 .from(tb)
-			 .groupBy(tb.DEPARTMENT_ID, tb.AGE)
-			 .having(tb.AGE.gt(age));
+			 .groupBy(tb.department_id, tb.age)
+			 .having(tb.age.gt(age));
 
 		List<Object> expectedValues = List.of(age);
 		String expected =
@@ -324,7 +324,7 @@ public class BaseSqlBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select()
 			 .from(tb)
-			 .orderBy(tb.NAME.asc(), tb.AGE.desc());
+			 .orderBy(tb.name.asc(), tb.age.desc());
 
 		String expected = "SELECT * FROM employees ORDER BY name ASC, age DESC";
 		assertEquals(expected, query.getSql());
@@ -475,23 +475,23 @@ public class BaseSqlBuilderTest {
 		final String title = "A%";
 		final int departmentId = 10;
 
-		DbFieldLike emp_count = etb.ID.count().as("emp_count");
+		DbFieldLike emp_count = etb.id.count().as("emp_count");
 
-		query.select(emp_count, dtb.TITLE.as("dep_name"))
+		query.select(emp_count, dtb.title.as("dep_name"))
 			 .from(etb.as("emp"))
 			 .innerJoin(dtb.as("dep"))
-			 .on(etb.DEPARTMENT_ID.eq(dtb.ID))
-			 .where(etb.IS_ACTIVE.eq(isActive).and(etb.AGE.gt(age).or(dtb.ADMIN_ID.eq(etb.ID))))
-			 .groupBy(dtb.TITLE)
-			 .having(dtb.TITLE.like(title))
+			 .on(etb.department_id.eq(dtb.id))
+			 .where(etb.is_active.eq(isActive).and(etb.age.gt(age).or(dtb.admin_id.eq(etb.id))))
+			 .groupBy(dtb.title)
+			 .having(dtb.title.like(title))
 			 .limit(10)
 			 .offset(3)
-			 .union(unionQuery.select(etb.ID.max(), dtb.TITLE.as("dep_name"))
+			 .union(unionQuery.select(etb.id.max(), dtb.title.as("dep_name"))
 							  .from(etb.as("uemp"))
 							  .innerJoin(dtb.as("udep"))
-							  .on(etb.DEPARTMENT_ID.eq(dtb.ID))
-							  .where(dtb.ID.gt(departmentId))
-							  .groupBy(dtb.TITLE))
+							  .on(etb.department_id.eq(dtb.id))
+							  .where(dtb.id.gt(departmentId))
+							  .groupBy(dtb.title))
 			 .orderBy(emp_count.desc());
 
 		String expectedSQL = "SELECT COUNT(emp.id) AS emp_count, dep.title AS dep_name " +

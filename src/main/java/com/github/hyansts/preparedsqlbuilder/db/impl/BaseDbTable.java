@@ -6,18 +6,18 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
 public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 
-	private final String TABLE_NAME;
-	private final String TABLE_PREFIX;
+	private final String tableName;
+	private final String tablePrefix;
 	private String tableAlias;
 
 	protected BaseDbTable(String name) {
-		this.TABLE_NAME = name;
-		this.TABLE_PREFIX = null;
+		this.tableName = name;
+		this.tablePrefix = null;
 	}
 
 	protected BaseDbTable(String name, String prefix) {
-		this.TABLE_NAME = name;
-		this.TABLE_PREFIX = prefix;
+		this.tableName = name;
+		this.tablePrefix = prefix;
 	}
 
 	@Override
@@ -28,13 +28,13 @@ public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 	}
 
 	@Override
-	public String getTableName() { return this.TABLE_NAME; }
+	public String getTableName() { return this.tableName; }
 
 	@Override
 	public String getAlias() { return this.tableAlias; }
 
 	@Override
-	public String getTablePrefix() { return this.TABLE_PREFIX; }
+	public String getTablePrefix() { return this.tablePrefix; }
 
 	@Override
 	public String getDefinition() {
@@ -44,8 +44,8 @@ public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 
 	@Override
 	public String getFullTableName() {
-		return this.TABLE_PREFIX == null || this.TABLE_PREFIX.isBlank()
-					   ? this.TABLE_NAME : this.TABLE_PREFIX + "." + this.TABLE_NAME;
+		return this.tablePrefix == null || this.tablePrefix.isBlank()
+					   ? this.tableName : this.tablePrefix + "." + this.tableName;
 	}
 
 }

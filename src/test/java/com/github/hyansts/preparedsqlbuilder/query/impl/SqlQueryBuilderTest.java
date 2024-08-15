@@ -14,20 +14,20 @@ public class SqlQueryBuilderTest {
 
 	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 
-		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
-		public final DbTableField<String> NAME = new DbTableField<>("name", this);
-		public final DbTableField<Integer> AGE = new DbTableField<>("age", this);
-		public final DbTableField<Boolean> IS_ACTIVE = new DbTableField<>("is_active", this);
-		public final DbTableField<Integer> DEPARTMENT_ID = new DbTableField<>("department_id", this);
+		public final DbTableField<Integer> id = new DbTableField<>("id", this);
+		public final DbTableField<String> name = new DbTableField<>("name", this);
+		public final DbTableField<Integer> age = new DbTableField<>("age", this);
+		public final DbTableField<Boolean> is_active = new DbTableField<>("is_active", this);
+		public final DbTableField<Integer> department_id = new DbTableField<>("department_id", this);
 
 		public EmployeesDbTable() { super("employees"); }
 	}
 
 	private static class DepartmentDbTable extends BaseDbTable<DepartmentDbTable> {
 
-		public final DbTableField<Integer> ID = new DbTableField<>("id", this);
-		public final DbTableField<String> TITLE = new DbTableField<>("title", this);
-		public final DbTableField<Integer> ADMIN_ID = new DbTableField<>("admin_id", this);
+		public final DbTableField<Integer> id = new DbTableField<>("id", this);
+		public final DbTableField<String> title = new DbTableField<>("title", this);
+		public final DbTableField<Integer> admin_id = new DbTableField<>("admin_id", this);
 
 		public DepartmentDbTable() { super("department"); }
 	}
@@ -42,8 +42,8 @@ public class SqlQueryBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.NAME.value(name))
-			 .where(tb.ID.eq(id));
+			 .set(tb.name.value(name))
+			 .where(tb.id.eq(id));
 
 		String expectedSQL = "UPDATE employees SET name = ? WHERE id = ?";
 		List<Object> expectedValues = List.of(name, id);
@@ -63,10 +63,10 @@ public class SqlQueryBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.NAME.value(name))
-			 .set(tb.AGE.value(age))
-			 .set(tb.IS_ACTIVE.value(isActive))
-			 .where(tb.ID.eq(id));
+			 .set(tb.name.value(name))
+			 .set(tb.age.value(age))
+			 .set(tb.is_active.value(isActive))
+			 .where(tb.id.eq(id));
 
 		String expectedSQL = "UPDATE employees SET name = ?, age = ?, is_active = ? WHERE id = ?";
 		List<Object> expectedValues = List.of(name, age, isActive, id);
@@ -83,7 +83,7 @@ public class SqlQueryBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.IS_ACTIVE.value(isActive));
+			 .set(tb.is_active.value(isActive));
 
 		String expected = "UPDATE employees SET is_active = ?";
 		List<Object> expectedValues = List.of(isActive);
@@ -100,7 +100,7 @@ public class SqlQueryBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.deleteFrom(tb)
-			 .where(tb.ID.eq(id));
+			 .where(tb.id.eq(id));
 
 		String expected = "DELETE FROM employees WHERE id = ?";
 		List<Object> expectedValues = List.of(id);
@@ -120,10 +120,10 @@ public class SqlQueryBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.insertInto(tb)
-			 .values(tb.ID.value(id),
-					 tb.NAME.value(name),
-					 tb.AGE.value(age),
-					 tb.IS_ACTIVE.value(isActive));
+			 .values(tb.id.value(id),
+					 tb.name.value(name),
+					 tb.age.value(age),
+					 tb.is_active.value(isActive));
 
 		String expected = "INSERT INTO employees (id, name, age, is_active) VALUES (?, ?, ?, ?)";
 		List<Object> expectedValues = List.of(id, name, age, isActive);

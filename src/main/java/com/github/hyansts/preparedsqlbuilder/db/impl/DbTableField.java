@@ -15,42 +15,42 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
 public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparableField<T> {
 
-	private final String FIELD_NAME;
-	private final DbTableLike TABLE;
+	private final String fieldName;
+	private final DbTableLike table;
 
 	private String alias;
 	private SqlSortOrder sortOrder;
 	private Function<String, String> aggregateFunction;
 
 	public DbTableField(String name, DbTableLike table) {
-		this.FIELD_NAME = name;
-		this.TABLE = table;
+		this.fieldName = name;
+		this.table = table;
 	}
 
 	private DbTableField(String name, DbTableLike table, Function<String, String> aggregateFunction) {
-		this.FIELD_NAME = name;
-		this.TABLE = table;
+		this.fieldName = name;
+		this.table = table;
 		this.aggregateFunction = aggregateFunction;
 	}
 
 	public DbTableField<T> max() {
-		return new DbTableField<>(this.FIELD_NAME, this.TABLE, SqlAggregator::max);
+		return new DbTableField<>(this.fieldName, this.table, SqlAggregator::max);
 	}
 
 	public DbTableField<T> min() {
-		return new DbTableField<>(this.FIELD_NAME, this.TABLE, SqlAggregator::min);
+		return new DbTableField<>(this.fieldName, this.table, SqlAggregator::min);
 	}
 
 	public DbTableField<Double> avg() {
-		return new DbTableField<>(this.FIELD_NAME, this.TABLE, SqlAggregator::avg);
+		return new DbTableField<>(this.fieldName, this.table, SqlAggregator::avg);
 	}
 
 	public DbTableField<Long> count() {
-		return new DbTableField<>(this.FIELD_NAME, this.TABLE, SqlAggregator::count);
+		return new DbTableField<>(this.fieldName, this.table, SqlAggregator::count);
 	}
 
 	public DbTableField<Double> sum() {
-		return new DbTableField<>(this.FIELD_NAME, this.TABLE, SqlAggregator::sum);
+		return new DbTableField<>(this.fieldName, this.table, SqlAggregator::sum);
 	}
 
 	@Override
@@ -72,12 +72,12 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	}
 
 	@Override
-	public DbFieldValue<T> value(T value) { return new DbTableFieldValue<>(this.FIELD_NAME, value); }
+	public DbFieldValue<T> value(T value) { return new DbTableFieldValue<>(this.fieldName, value); }
 
 	@Override
 	public String getFullQualification() {
-		return this.TABLE == null || this.TABLE.getAlias() == null || this.TABLE.getAlias().isBlank()
-					   ? this.FIELD_NAME : this.TABLE.getAlias() + "." + this.FIELD_NAME;
+		return this.table == null || this.table.getAlias() == null || this.table.getAlias().isBlank()
+					   ? this.fieldName : this.table.getAlias() + "." + this.fieldName;
 	}
 
 	@Override
@@ -97,10 +97,10 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	}
 
 	@Override
-	public String getFieldName() { return this.FIELD_NAME; }
+	public String getFieldName() { return this.fieldName; }
 
 	@Override
-	public DbTableLike getTableLike() { return this.TABLE; }
+	public DbTableLike getTableLike() { return this.table; }
 
 	@Override
 	public DbComparableField<T> mapTo(DbTableLike tableLike) { return new DbTableField<>(this.getLabel(), tableLike); }

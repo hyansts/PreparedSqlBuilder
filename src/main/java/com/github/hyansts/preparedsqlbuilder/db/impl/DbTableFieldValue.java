@@ -4,21 +4,21 @@ import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
 
 public class DbTableFieldValue<T> implements DbFieldValue<T> {
 
-	private final String FIELD_NAME;
-	private final T VALUE;
+	private final String fieldName;
+	private final T value;
 
 	public DbTableFieldValue(String fieldName, T value) {
-		this.VALUE = value;
-		this.FIELD_NAME = fieldName;
+		this.value = value;
+		this.fieldName = fieldName;
 	}
 
 	@Override
 	public String getFieldName() {
-		return this.FIELD_NAME;
+		return this.fieldName;
 	}
 
 	@Override
 	public T getValue() {
-		return this.VALUE;
+		return this.value;
 	}
 }
