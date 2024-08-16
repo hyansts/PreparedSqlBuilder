@@ -1,5 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder.sql;
 
+import java.util.StringJoiner;
+
 //TODO write tests
 public class SqlScalar {
 
@@ -9,7 +11,7 @@ public class SqlScalar {
 	public static String trim(String arg) { return format("TRIM", arg); }
 	public static String upper(String arg) { return format("UPPER", arg); }
 	public static String lower(String arg) { return format("LOWER", arg); }
-	public static String concat(String... args) { return format("CONCAT", args); }
+	public static String concat(String... args) { return format("CONCAT", (Object[]) args); }
 	public static String length(String arg) { return format("LENGTH", arg); }
 	public static String substring(String arg, int start) { return format("SUBSTRING", arg, start); }
 	public static String substring(String arg, int start, int end) { return format("SUBSTRING", arg, start, end); }
@@ -22,36 +24,19 @@ public class SqlScalar {
 	public static String round(String field) { return format("ROUND", field); }
 
 	// :: For dates
-	public static String date(String... fields) { return format("DATE", fields); }
-	public static String time(String... fields) { return format("TIME", fields); }
-	public static String datetime(String... fields) { return format("DATETIME", fields); }
+	public static String date(String... fields) { return format("DATE", (Object[]) fields); }
+	public static String time(String... fields) { return format("TIME", (Object[]) fields); }
+	public static String datetime(String... fields) { return format("DATETIME", (Object[]) fields); }
 
 	// :: For null values
 	public static String nullif(String field1, String field2) { return format("NULLIF", field1, field2); }
-	public static String coalesce(String... fields) { return format("COALESCE", fields); }
+	public static String coalesce(String... fields) { return format("COALESCE", (Object[]) fields); }
 
-	// :: Format helpers
-	private static String format(String str, String arg) {
-		return String.format(str + "(%s)", arg);
-	}
-
-	private static String format(String str, String arg1, String arg2) {
-		return String.format(str + "(%s, %s)", arg1, arg2);
-	}
-
-	private static String format(String str, String arg1, int arg2) {
-		return String.format(str + "(%s, %d)", arg1, arg2);
-	}
-
-	private static String format(String str, String arg1, int arg2, int arg3) {
-		return String.format(str + "(%s, %d, %d)", arg1, arg2, arg3);
-	}
-
-	private static String format(String str, String arg1, String arg2, String arg3) {
-		return String.format(str + "(%s, %s, %s)", arg1, arg2, arg3);
-	}
-
-	private static String format(String str, String... args) {
-		return String.format(str + "(%s" + ", %s".repeat(args.length - 1) + ")", (Object[]) args);
+	private static String format(String str, Object... args) {
+		StringJoiner joiner = new StringJoiner(", ", "(", ")");
+		for (Object arg : args) {
+			joiner.add(String.valueOf(arg));
+		}
+		return joiner.toString();
 	}
 }

@@ -467,31 +467,34 @@ public class BaseSqlBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlQuery unionQuery = SqlQueryFactory.createQuery();
 
-		EmployeesDbTable etb = new EmployeesDbTable();
-		DepartmentDbTable dtb = new DepartmentDbTable();
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		EmployeesDbTable uemp = new EmployeesDbTable();
+		DepartmentDbTable udep = new DepartmentDbTable();
 
 		final boolean isActive = true;
 		final int age = 30;
 		final String title = "A%";
 		final int departmentId = 10;
 
-		DbFieldLike emp_count = etb.id.count().as("emp_count");
+		DbFieldLike emp_count = emp.id.count().as("emp_count");
 
-		query.select(emp_count, dtb.title.as("dep_name"))
-			 .from(etb.as("emp"))
-			 .innerJoin(dtb.as("dep"))
-			 .on(etb.department_id.eq(dtb.id))
-			 .where(etb.is_active.eq(isActive).and(etb.age.gt(age).or(dtb.admin_id.eq(etb.id))))
-			 .groupBy(dtb.title)
-			 .having(dtb.title.like(title))
+		query.select(emp_count, dep.title.as("dep_name"))
+			 .from(emp.as("emp"))
+			 .innerJoin(dep.as("dep"))
+			 .on(emp.department_id.eq(dep.id))
+			 .where(emp.is_active.eq(isActive).and(emp.age.gt(age).or(dep.admin_id.eq(emp.id))))
+			 .groupBy(dep.title)
+			 .having(dep.title.like(title))
 			 .limit(10)
 			 .offset(3)
-			 .union(unionQuery.select(etb.id.max(), dtb.title.as("dep_name"))
-							  .from(etb.as("uemp"))
-							  .innerJoin(dtb.as("udep"))
-							  .on(etb.department_id.eq(dtb.id))
-							  .where(dtb.id.gt(departmentId))
-							  .groupBy(dtb.title))
+			 .union(unionQuery.select(uemp.id.max(), udep.title.as("dep_name"))
+							  .from(uemp.as("uemp"))
+							  .innerJoin(udep.as("udep"))
+							  .on(uemp.department_id.eq(udep.id))
+							  .where(udep.id.gt(departmentId))
+							  .groupBy(udep.title))
 			 .orderBy(emp_count.desc());
 
 		String expectedSQL = "SELECT COUNT(emp.id) AS emp_count, dep.title AS dep_name " +

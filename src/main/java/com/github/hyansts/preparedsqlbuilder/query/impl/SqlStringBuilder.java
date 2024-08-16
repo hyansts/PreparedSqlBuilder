@@ -4,7 +4,9 @@ import java.util.StringJoiner;
 
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.AND;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.EQ;
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.OR;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 
 /**
@@ -90,6 +92,28 @@ public class SqlStringBuilder {
 	 */
 	public SqlStringBuilder where(String condition) {
 		this.sql.append(WHERE).append(condition);
+		return this;
+	}
+
+	/**
+	 * Appends a AND keyword to the SQL query with the specified condition.
+	 *
+	 * @param condition the condition to be appended using the AND keyword.
+	 * @return the current instance of {@code SqlStringBuilder} with the appended condition.
+	 */
+	public SqlStringBuilder and(String condition) {
+		this.sql.append(AND).append(condition);
+		return this;
+	}
+
+	/**
+	 * Appends a OR keyword to the SQL query with the specified condition.
+	 *
+	 * @param condition the condition to be appended using the OR keyword.
+	 * @return the current instance of {@code SqlStringBuilder} with the appended condition.
+	 */
+	public SqlStringBuilder or(String condition) {
+		this.sql.append(OR).append(condition);
 		return this;
 	}
 
