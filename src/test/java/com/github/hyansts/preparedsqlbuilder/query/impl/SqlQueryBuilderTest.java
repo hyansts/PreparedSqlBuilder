@@ -63,9 +63,7 @@ public class SqlQueryBuilderTest {
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.update(tb)
-			 .set(tb.name.value(name))
-			 .set(tb.age.value(age))
-			 .set(tb.is_active.value(isActive))
+			 .set(tb.name.value(name), tb.age.value(age), tb.is_active.value(isActive))
 			 .where(tb.id.eq(id));
 
 		String expectedSQL = "UPDATE employees SET name = ?, age = ?, is_active = ? WHERE id = ?";

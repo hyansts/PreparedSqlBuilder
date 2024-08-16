@@ -12,12 +12,9 @@ import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import com.github.hyansts.preparedsqlbuilder.query.UpdateQuerySteps;
 import com.github.hyansts.preparedsqlbuilder.query.UpdateStep;
 
-import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.EQ;
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 
 class SqlQueryBuilder extends BaseSqlBuilder implements SqlQuery, UpdateQuerySteps, DeleteStep, InsertStep {
-
-	private boolean chainNextSetClause = false;
 
 	@Override
 	public UpdateStep update(DbTable table) {
@@ -25,18 +22,24 @@ class SqlQueryBuilder extends BaseSqlBuilder implements SqlQuery, UpdateQuerySte
 		return this;
 	}
 
-	//TODO change to take varargs instead
 	@Override
-	public SetStep set(DbFieldValue<?> field) {
-		this.sql.append(this.chainNextSetClause ? ", " : SET).append(field.getFieldName()).append(EQ);
-		this.chainNextSetClause = true;
-		if (field.getValue() == null) {
-			//FIXME this might break preparedStatement batch execution
-			this.sql.append("null");
-			return this;
+	public SetStep set(DbFieldValue<?>... fields) {
+
+		StringJoiner joinedFields = new StringJoiner(", ");
+
+		for (var field : fields) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(field.getFieldName()).append(" = ");
+			if (field.getValue() == null) {
+				//FIXME this might break preparedStatement batch execution
+				sb.append("null");
+				continue;
+			}
+			this.values.add(field.getValue());
+			sb.append('?');
+			joinedFields.add(sb);
 		}
-		this.values.add(field.getValue());
-		this.sql.append('?');
+		this.sql.append(SET).append(joinedFields);
 		return this;
 	}
 
