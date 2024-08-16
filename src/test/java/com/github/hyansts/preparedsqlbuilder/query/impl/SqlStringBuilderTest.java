@@ -136,7 +136,7 @@ public class SqlStringBuilderTest {
 
 		buildSql.select("*")
 				.from("employees as e")
-				.rigtJoin("department as d")
+				.rightJoin("department as d")
 				.on("e.dep_id = d.id");
 
 		String expected = "SELECT * FROM employees as e RIGHT JOIN department as d ON e.dep_id = d.id";
