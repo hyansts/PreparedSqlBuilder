@@ -14,7 +14,7 @@ import com.github.hyansts.preparedsqlbuilder.query.UpdateStep;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 
-class SqlQueryBuilder extends BaseSqlBuilder implements SqlQuery, UpdateQuerySteps, DeleteStep, InsertStep {
+class SqlQueryBuilder extends BaseSqlBuilder<SqlQuery> implements SqlQuery, UpdateQuerySteps, DeleteStep, InsertStep {
 
 	@Override
 	public UpdateStep update(DbTable table) {
@@ -75,4 +75,8 @@ class SqlQueryBuilder extends BaseSqlBuilder implements SqlQuery, UpdateQuerySte
 		return this;
 	}
 
+	@Override
+	public SqlQuery getQuery() {
+		return this;
+	}
 }

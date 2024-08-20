@@ -5,22 +5,32 @@ import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
-public interface FromStep extends CombiningOperation {
-	WhereStep where(SqlCondition condition);
+public interface FromStep<T> extends CombiningOperation<T> {
+	WhereStep<T> where(SqlCondition condition);
 
-	JoinStep innerJoin(DbTableLike table);
+	JoinStep<T> innerJoin(DbTableLike table);
 
-	JoinStep leftJoin(DbTableLike table);
+	JoinStep<T> innerJoin(CombinableQuery<SqlSubquery> tableLike);
 
-	JoinStep rightJoin(DbTableLike table);
+	JoinStep<T> leftJoin(DbTableLike table);
 
-	JoinStep fullJoin(DbTableLike table);
+	JoinStep<T> leftJoin(CombinableQuery<SqlSubquery> tableLike);
 
-	FromStep crossJoin(DbTableLike table);
+	JoinStep<T> rightJoin(DbTableLike table);
 
-	GroupByStep groupBy(DbField... fields);
+	JoinStep<T> rightJoin(CombinableQuery<SqlSubquery> tableLike);
 
-	OrderByStep orderBy(DbFieldLike... fields);
+	JoinStep<T> fullJoin(DbTableLike table);
 
-	LimitStep limit(Integer number);
+	JoinStep<T> fullJoin(CombinableQuery<SqlSubquery> tableLike);
+
+	FromStep<T> crossJoin(DbTableLike table);
+
+	FromStep<T> crossJoin(CombinableQuery<SqlSubquery> tableLike);
+
+	GroupByStep<T> groupBy(DbField... fields);
+
+	OrderByStep<T> orderBy(DbFieldLike... fields);
+
+	LimitStep<T> limit(Integer number);
 }

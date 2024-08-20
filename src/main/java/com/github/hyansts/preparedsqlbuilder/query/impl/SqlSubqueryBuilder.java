@@ -2,12 +2,11 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
-import com.github.hyansts.preparedsqlbuilder.query.SelectQuerySteps;
 import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
-class SqlSubqueryBuilder extends BaseSqlBuilder implements SqlSubquery, SelectQuerySteps {
+class SqlSubqueryBuilder extends BaseSqlBuilder<SqlSubquery> implements SqlSubquery {
 
 	private String alias;
 
@@ -34,7 +33,11 @@ class SqlSubqueryBuilder extends BaseSqlBuilder implements SqlSubquery, SelectQu
 	}
 
 	@Override
-	public DbComparableField<?> getField(int fieldIndex) {
-		return this.selectedFields.get(fieldIndex).mapTo(this);
+	public <T> DbComparableField<T> getField(int fieldIndex, Class<T> type) {
+		return this.selectedFields.get(fieldIndex).mapTo(this, type);
+	}
+	@Override
+	public SqlSubquery getQuery() {
+		return this;
 	}
 }

@@ -11,7 +11,7 @@ public interface DbFieldLike {
 
 	DbTableLike getTableLike();
 
-	DbComparableField<?> mapTo(DbTableLike tableLike);
+	<T> DbComparableField<T> mapTo(DbTableLike tableLike, Class<T> type);
 
 	SqlSortOrder getSortOrder();
 

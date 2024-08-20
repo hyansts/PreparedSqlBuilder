@@ -3,13 +3,12 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
-import com.github.hyansts.preparedsqlbuilder.query.SelectQuerySteps;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
-class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder implements SqlScalarSubquery<T>, SelectQuerySteps {
+class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> implements SqlScalarSubquery<T> {
 
 	private String alias;
 	private DbTableLike tableLike;
@@ -68,8 +67,12 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder implements SqlScalarSub
 	public SqlSortOrder getSortOrder() { return sortOrder; }
 
 	@Override
-	public DbComparableField<T> mapTo(DbTableLike tableLike) {
+	public <R> DbComparableField<R> mapTo(DbTableLike tableLike, Class<R> type) {
 		return new SqlScalarSubqueryBuilder<>(tableLike);
 	}
 
+	@Override
+	public SqlScalarSubquery<T> getQuery() {
+		return this;
+	}
 }

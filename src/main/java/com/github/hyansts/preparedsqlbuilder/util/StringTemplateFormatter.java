@@ -34,7 +34,7 @@ public class StringTemplateFormatter {
 	 * @param value the value used to replace the placeholder.
 	 */
 	public void put(String key, Object value) {
-		placeHolders.put(key, value);
+		this.placeHolders.put(key, value);
 	}
 
 	/**
@@ -102,6 +102,21 @@ public class StringTemplateFormatter {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Finds and returns the first occurrence of a placeholder key inside the prefix and suffix in the template.
+	 *
+	 * @param template the template string to be searched
+	 * @return the first string key found in between the suffix and prefix. Returns {@code null} if none.
+	 */
+	public String findFirstKey(String template) {
+		int prefixIndex = template.indexOf(this.prefix);
+		int suffixIndex = template.indexOf(this.suffix, prefixIndex + this.prefix.length());
+		if (prefixIndex != -1 && suffixIndex != -1) {
+			return template.substring(prefixIndex + this.prefix.length(), suffixIndex);
+		}
+		return null;
 	}
 
 }

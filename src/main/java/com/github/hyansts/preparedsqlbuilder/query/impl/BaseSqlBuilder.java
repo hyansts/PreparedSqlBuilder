@@ -13,6 +13,7 @@ import com.github.hyansts.preparedsqlbuilder.query.CombinableQuery;
 import com.github.hyansts.preparedsqlbuilder.query.CombiningOperation;
 import com.github.hyansts.preparedsqlbuilder.query.FromStep;
 import com.github.hyansts.preparedsqlbuilder.query.GroupByStep;
+import com.github.hyansts.preparedsqlbuilder.query.HavingStep;
 import com.github.hyansts.preparedsqlbuilder.query.JoinStep;
 import com.github.hyansts.preparedsqlbuilder.query.LimitStep;
 import com.github.hyansts.preparedsqlbuilder.query.OrderByStep;
@@ -20,6 +21,7 @@ import com.github.hyansts.preparedsqlbuilder.query.SelectQuerySteps;
 import com.github.hyansts.preparedsqlbuilder.query.SelectStatement;
 import com.github.hyansts.preparedsqlbuilder.query.SelectStep;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
+import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 import com.github.hyansts.preparedsqlbuilder.query.UnionStep;
 import com.github.hyansts.preparedsqlbuilder.query.WhereStep;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
@@ -28,20 +30,20 @@ import com.github.hyansts.preparedsqlbuilder.util.StringTemplateFormatter;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
 
-abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
+abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps<T> {
 
 	protected final StringBuilder sql = new StringBuilder(128);
 	protected final List<Object> values = new ArrayList<>();
 	protected final List<DbFieldLike> selectedFields = new ArrayList<>();
 
 	@Override
-	public SelectStep select(DbFieldLike... fields) {
+	public SelectStep<T> select(DbFieldLike... fields) {
 		this.sql.append(SELECT).append(chainFieldsDefinitions(fields));
 		return this;
 	}
 
 	@Override
-	public SelectStep select(String expression, DbFieldLike... fields) {
+	public SelectStep<T> select(String expression, DbFieldLike... fields) {
 		this.sql.append(SELECT).append(expression);
 		if (fields != null && fields.length > 0) {
 			this.sql.append(", ").append(chainFieldsDefinitions(fields));
@@ -50,13 +52,13 @@ abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
 	}
 
 	@Override
-	public SelectStep selectDistinct(DbFieldLike... fields) {
-		sql.append(SELECT).append(DISTINCT).append(chainFieldsDefinitions(fields));
+	public SelectStep<T> selectDistinct(DbFieldLike... fields) {
+		this.sql.append(SELECT).append(DISTINCT).append(chainFieldsDefinitions(fields));
 		return this;
 	}
 
 	@Override
-	public SelectStep selectDistinct(String expression, DbFieldLike... fields) {
+	public SelectStep<T> selectDistinct(String expression, DbFieldLike... fields) {
 		this.sql.append(SELECT).append(DISTINCT).append(expression);
 		if (fields != null && fields.length > 0) {
 			this.sql.append(", ").append(chainFieldsDefinitions(fields));
@@ -65,75 +67,105 @@ abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
 	}
 
 	@Override
-	public SelectStep selectCount(DbField field) {
-		sql.append(SELECT).append(SqlAggregator.count(field.getFullQualification()));
+	public SelectStep<T> selectCount(DbField field) {
+		this.sql.append(SELECT).append(SqlAggregator.count(field.getFullQualification()));
 		return this;
 	}
 
 	@Override
-	public SelectStep selectCount() {
-		sql.append(SELECT).append(SqlAggregator.count("*"));
+	public SelectStep<T> selectCount() {
+		this.sql.append(SELECT).append(SqlAggregator.count("*"));
 		return this;
 	}
 
 	@Override
-	public FromStep from(DbTableLike table) {
+	public FromStep<T> from(DbTableLike table) {
 		this.sql.append(FROM).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
-	public WhereStep where(SqlCondition condition) {
+	public FromStep<T> from(CombinableQuery<SqlSubquery> tableLike) {
+		return from((DbTableLike) tableLike);
+	}
+
+	@Override
+	public WhereStep<T> where(SqlCondition condition) {
 		this.values.addAll(condition.getComparedValues());
 		this.sql.append(WHERE).append(condition);
 		return this;
 	}
 
 	@Override
-	public JoinStep innerJoin(DbTableLike table) {
+	public JoinStep<T> innerJoin(DbTableLike table) {
 		this.sql.append(INNER_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
-	public JoinStep leftJoin(DbTableLike table) {
+	public JoinStep<T> innerJoin(CombinableQuery<SqlSubquery> tableLike) {
+		return innerJoin((DbTableLike) tableLike);
+	}
+
+	@Override
+	public JoinStep<T> leftJoin(DbTableLike table) {
 		this.sql.append(LEFT_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
-	public JoinStep rightJoin(DbTableLike table) {
+	public JoinStep<T> leftJoin(CombinableQuery<SqlSubquery> tableLike) {
+		return leftJoin((DbTableLike) tableLike);
+	}
+
+	@Override
+	public JoinStep<T> rightJoin(DbTableLike table) {
 		this.sql.append(RIGHT_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
-	public JoinStep fullJoin(DbTableLike table) {
+	public JoinStep<T> rightJoin(CombinableQuery<SqlSubquery> tableLike) {
+		return rightJoin((DbTableLike) tableLike);
+	}
+
+	@Override
+	public JoinStep<T> fullJoin(DbTableLike table) {
 		this.sql.append(FULL_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
-	public FromStep crossJoin(DbTableLike table) {
+	public JoinStep<T> fullJoin(CombinableQuery<SqlSubquery> tableLike) {
+		return fullJoin((DbTableLike) tableLike);
+	}
+
+	@Override
+	public FromStep<T> crossJoin(DbTableLike table) {
 		this.sql.append(CROSS_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
 	}
 
 	@Override
-	public FromStep on(SqlCondition condition) {
+	public FromStep<T> crossJoin(CombinableQuery<SqlSubquery> tableLike) {
+		return crossJoin((DbTableLike) tableLike);
+	}
+
+	@Override
+	public FromStep<T> on(SqlCondition condition) {
 		this.values.addAll(condition.getComparedValues());
 		this.sql.append(ON).append(condition);
 		return this;
 	}
 
 	@Override
-	public GroupByStep groupBy(DbField... fields) {
+	public GroupByStep<T> groupBy(DbField... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
 			joinedFields.add(field.getFullQualification());
@@ -143,14 +175,14 @@ abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
 	}
 
 	@Override
-	public OrderByStep having(SqlCondition condition) {
+	public HavingStep<T> having(SqlCondition condition) {
 		this.values.addAll(condition.getComparedValues());
 		this.sql.append(HAVING).append(condition);
 		return this;
 	}
 
 	@Override
-	public OrderByStep orderBy(DbFieldLike... fields) {
+	public OrderByStep<T> orderBy(DbFieldLike... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
 			String sortOrder = field.getSortOrder() != null ? field.getSortOrder().toString() : "";
@@ -161,54 +193,54 @@ abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
 	}
 
 	@Override
-	public LimitStep limit(Integer number) {
+	public LimitStep<T> limit(Integer number) {
 		this.sql.append(LIMIT).append(number);
 		return this;
 	}
 
 	@Override
-	public CombiningOperation offset(Integer number) {
+	public CombiningOperation<T> offset(Integer number) {
 		this.sql.append(OFFSET).append(number);
 		return this;
 	}
 
 	@Override
-	public UnionStep union(CombinableQuery query) {
+	public UnionStep<T> union(CombinableQuery<T> query) {
 		this.values.addAll(query.getValues());
 		this.sql.append(UNION).append(query);
 		return this;
 	}
 
 	@Override
-	public UnionStep unionAll(CombinableQuery query) {
+	public UnionStep<T> unionAll(CombinableQuery<T> query) {
 		this.values.addAll(query.getValues());
 		this.sql.append(UNION_ALL).append(query);
 		return this;
 	}
 
 	@Override
-	public UnionStep intersect(CombinableQuery query) {
+	public UnionStep<T> intersect(CombinableQuery<T> query) {
 		this.values.addAll(query.getValues());
 		this.sql.append(INTERSECT).append(query);
 		return this;
 	}
 
 	@Override
-	public UnionStep intersectAll(CombinableQuery query) {
+	public UnionStep<T> intersectAll(CombinableQuery<T> query) {
 		this.values.addAll(query.getValues());
 		this.sql.append(INTERSECT_ALL).append(query);
 		return this;
 	}
 
 	@Override
-	public UnionStep except(CombinableQuery query) {
+	public UnionStep<T> except(CombinableQuery<T> query) {
 		this.values.addAll(query.getValues());
 		this.sql.append(EXCEPT).append(query);
 		return this;
 	}
 
 	@Override
-	public UnionStep exceptAll(CombinableQuery query) {
+	public UnionStep<T> exceptAll(CombinableQuery<T> query) {
 		this.values.addAll(query.getValues());
 		this.sql.append(EXCEPT_ALL).append(query);
 		return this;
@@ -225,8 +257,16 @@ abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
 	@Override
 	public List<Object> getValues() { return values; }
 
+	//TODO test this exception
 	@Override
 	public String getSql() {
+		StringTemplateFormatter formatter = new StringTemplateFormatter();
+		String undefinedFieldKey = formatter.findFirstKey(this.sql.toString());
+		if (undefinedFieldKey != null && !undefinedFieldKey.isEmpty()) {
+			String undefinedField = this.selectedFields.get(Integer.parseInt(undefinedFieldKey)).getDefinition();
+			throw new IllegalStateException("Selected field not found: '" + undefinedField +
+													"' doesn't belong to any table defined in the FROM or JOIN clause.");
+		}
 		return this.sql.toString();
 	}
 
@@ -251,6 +291,9 @@ abstract class BaseSqlBuilder implements SelectStatement, SelectQuerySteps {
 	}
 
 	private void processFieldDefinition(DbTableLike tableLike) {
+		if (tableLike instanceof SqlSubquery subquery) {
+			this.values.addAll(subquery.getValues());
+		}
 		StringTemplateFormatter formatter = new StringTemplateFormatter();
 		for (int i = 0; i < this.selectedFields.size(); i++) {
 			if (this.selectedFields.get(i).getTableLike() == tableLike) {

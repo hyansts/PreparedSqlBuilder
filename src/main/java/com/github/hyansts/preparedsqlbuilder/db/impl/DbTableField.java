@@ -103,7 +103,10 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	public DbTableLike getTableLike() { return this.table; }
 
 	@Override
-	public DbComparableField<T> mapTo(DbTableLike tableLike) { return new DbTableField<>(this.getLabel(), tableLike); }
+	public <R> DbComparableField<R> mapTo(DbTableLike tableLike, Class<R> clazz) {
+		String fieldName = this.alias == null || this.alias.isBlank() ? this.fieldName : this.alias;
+		return new DbTableField<>(fieldName, tableLike);
+	}
 
 	@Override
 	public SqlSortOrder getSortOrder() { return this.sortOrder; }

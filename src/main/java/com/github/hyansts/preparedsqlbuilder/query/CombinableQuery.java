@@ -1,3 +1,5 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-public interface CombinableQuery extends PreparedSql { }
+public interface CombinableQuery<T> extends PreparedSql {
+	T getQuery();
+}

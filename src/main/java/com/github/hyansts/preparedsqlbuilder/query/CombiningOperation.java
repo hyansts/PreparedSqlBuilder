@@ -1,15 +1,15 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-public interface CombiningOperation extends CombinableQuery {
-	UnionStep union(CombinableQuery query);
+public interface CombiningOperation<T> extends CombinableQuery<T> {
+	UnionStep<T> union(CombinableQuery<T> query);
 
-	UnionStep unionAll(CombinableQuery query);
+	UnionStep<T> unionAll(CombinableQuery<T> query);
 
-	UnionStep intersect(CombinableQuery query);
+	UnionStep<T> intersect(CombinableQuery<T> query);
 
-	UnionStep intersectAll(CombinableQuery query);
+	UnionStep<T> intersectAll(CombinableQuery<T> query);
 
-	UnionStep except(CombinableQuery query);
+	UnionStep<T> except(CombinableQuery<T> query);
 
-	UnionStep exceptAll(CombinableQuery query);
+	UnionStep<T> exceptAll(CombinableQuery<T> query);
 }
