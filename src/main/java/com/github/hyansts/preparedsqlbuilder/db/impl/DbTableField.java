@@ -10,24 +10,30 @@ import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbWritableField;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
+import com.github.hyansts.preparedsqlbuilder.util.StringHolder;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
 public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparableField<T> {
 
-	private final String fieldName;
+	private final StringHolder fieldName;
+	private final StringHolder alias = new StringHolder();
 	private final DbTableLike table;
 
-	private String alias;
 	private SqlSortOrder sortOrder;
 	private Function<String, String> aggregateFunction;
 
 	public DbTableField(String name, DbTableLike table) {
+		this.fieldName = new StringHolder(name);
+		this.table = table;
+	}
+
+	private DbTableField(StringHolder name, DbTableLike table) {
 		this.fieldName = name;
 		this.table = table;
 	}
 
-	private DbTableField(String name, DbTableLike table, Function<String, String> aggregateFunction) {
+	private DbTableField(StringHolder name, DbTableLike table, Function<String, String> aggregateFunction) {
 		this.fieldName = name;
 		this.table = table;
 		this.aggregateFunction = aggregateFunction;
@@ -67,22 +73,22 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 
 	@Override
 	public DbFieldLike as(String alias) {
-		this.alias = alias;
+		this.alias.setValue(alias);
 		return this;
 	}
 
 	@Override
-	public DbFieldValue<T> value(T value) { return new DbTableFieldValue<>(this.fieldName, value); }
+	public DbFieldValue<T> value(T value) { return new DbTableFieldValue<>(this.fieldName.getValue(), value); }
 
 	@Override
 	public String getFullQualification() {
 		return this.table == null || this.table.getAlias() == null || this.table.getAlias().isBlank()
-					   ? this.fieldName : this.table.getAlias() + "." + this.fieldName;
+					   ? this.fieldName.getValue() : this.table.getAlias() + "." + this.fieldName.getValue();
 	}
 
 	@Override
 	public String getLabel() {
-		return this.alias == null || this.alias.isBlank() ? this.getFullQualification() : this.alias;
+		return this.alias.isBlank() ? this.getFullQualification() : this.alias.getValue();
 	}
 
 	@Override
@@ -93,19 +99,19 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 		} else {
 			definition = this.getFullQualification();
 		}
-		return this.alias == null || this.alias.isBlank() ? definition : definition + AS + this.alias;
+		return this.alias.isBlank() ? definition : definition + AS + this.alias;
 	}
 
 	@Override
-	public String getFieldName() { return this.fieldName; }
+	public String getFieldName() { return this.fieldName.getValue(); }
 
 	@Override
 	public DbTableLike getTableLike() { return this.table; }
 
 	@Override
-	public <R> DbComparableField<R> mapTo(DbTableLike tableLike, Class<R> clazz) {
-		String fieldName = this.alias == null || this.alias.isBlank() ? this.fieldName : this.alias;
-		return new DbTableField<>(fieldName, tableLike);
+	public DbComparableField<T> mapTo(DbTableLike tableLike) {
+		this.alias.setDefaultHolder(fieldName);
+		return new DbTableField<>(this.alias, tableLike);
 	}
 
 	@Override

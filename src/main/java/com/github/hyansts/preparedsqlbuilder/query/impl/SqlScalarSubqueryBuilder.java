@@ -5,18 +5,23 @@ import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
+import com.github.hyansts.preparedsqlbuilder.util.StringHolder;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
 class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> implements SqlScalarSubquery<T> {
 
-	private String alias;
-	private DbTableLike tableLike;
+	private final StringHolder alias;
+	private final DbTableLike tableLike;
 	private SqlSortOrder sortOrder;
 
-	public SqlScalarSubqueryBuilder() { }
+	public SqlScalarSubqueryBuilder() {
+		this.alias = new StringHolder();
+		this.tableLike = null;
+	}
 
-	public SqlScalarSubqueryBuilder(DbTableLike tableLike) {
+	private SqlScalarSubqueryBuilder(StringHolder alias, DbTableLike tableLike) {
+		this.alias = alias;
 		this.tableLike = tableLike;
 	}
 
@@ -28,16 +33,15 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 
 	@Override
 	public String getDefinition() {
-		return this.alias == null || this.alias.isBlank()
-					   ? this.getFullQualification() : this.getFullQualification() + AS + this.alias;
+		return this.alias.isBlank() ? this.getFullQualification() : this.getFullQualification() + AS + this.alias;
 	}
 
 	@Override
 	public String getLabel() {
-		if (this.alias == null || this.alias.isBlank()) {
-			throw new IllegalStateException("Cannot reference a subquery with an empty alias: " + getDefinition());
+		if (this.alias.isBlank()) {
+			throw new IllegalStateException("Cannot reference a subquery with an empty alias: " + this.getSql());
 		}
-		return this.alias;
+		return this.alias.getValue();
 	}
 
 	@Override
@@ -47,7 +51,7 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 
 	@Override
 	public DbFieldLike as(String alias) {
-		this.alias = alias;
+		this.alias.setValue(alias);
 		return this;
 	}
 
@@ -67,8 +71,8 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 	public SqlSortOrder getSortOrder() { return sortOrder; }
 
 	@Override
-	public <R> DbComparableField<R> mapTo(DbTableLike tableLike, Class<R> type) {
-		return new SqlScalarSubqueryBuilder<>(tableLike);
+	public DbComparableField<T> mapTo(DbTableLike tableLike) {
+		return new SqlScalarSubqueryBuilder<>(this.alias, tableLike);
 	}
 
 	@Override

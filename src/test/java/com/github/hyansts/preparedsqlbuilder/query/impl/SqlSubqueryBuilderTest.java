@@ -2,7 +2,7 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
@@ -48,7 +48,9 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		subquery.select(subEmp.id.count().as("id_count"), subEmp.department_id, subDep.title.as("dep_name"))
+		DbTableField<Long> id_count = subEmp.id.count();
+
+		subquery.select(id_count.as("id_count"), subEmp.department_id, subDep.title.as("dep_name"))
 				.from(subEmp.as("subemp"))
 				.innerJoin(subDep.as("subdep"))
 				.on(subEmp.department_id.eq(subDep.id))
@@ -56,12 +58,12 @@ public class SqlSubqueryBuilderTest {
 				.groupBy(subEmp.department_id, subDep.title)
 				.having(subDep.title.like(title));
 
-		DbFieldLike emp_count = subquery.getField(0, Integer.class);
+		DbComparableField<Long> emp_count = subquery.getField(id_count);
 
 		query.select(emp_count, dep.title, dep.admin_id.as("dep_admin"))
 			 .from(subquery.as("emp"))
 			 .innerJoin(dep.as("dep"))
-			 .on(subquery.getField(1, Integer.class).eq(dep.id))
+			 .on(subquery.getField(subEmp.department_id).eq(dep.id))
 			 .where(dep.admin_id.ge(adminId))
 			 .orderBy(emp_count.desc())
 			 .limit(10)
@@ -95,13 +97,13 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		DbFieldLike max_age = emp.age.max().as("max_age");
+		DbTableField<Integer> maxAge = emp.age.max();
 
-		query.select(emp.department_id.mapTo(subquery, Integer.class), max_age.mapTo(subquery, Integer.class), dep.title)
-			 .from(subquery.select(emp.department_id, max_age)
+		query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
+			 .from(subquery.select(emp.department_id, maxAge.as("max_age"))
 						   .from(emp)
 						   .groupBy(emp.department_id).getQuery().as("dtemp"))
-			 .innerJoin(dep.as("dep")).on(emp.department_id.mapTo(subquery, Integer.class).eq(dep.id));
+			 .innerJoin(dep.as("dep")).on(emp.department_id.mapTo(subquery).eq(dep.id));
 
 		String expectedSQL = "SELECT dtemp.department_id, dtemp.max_age, dep.title " +
 									 "FROM ("

@@ -255,8 +255,8 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	//TODO test this exception
 	@Override
 	public String getSql() {
-		StringTemplateFormatter formatter = new StringTemplateFormatter();
-		String undefinedFieldKey = formatter.findFirstKey(this.sql.toString());
+		processFieldDefinition(null);
+		String undefinedFieldKey = new StringTemplateFormatter().findFirstKey(this.sql.toString());
 		if (undefinedFieldKey != null && !undefinedFieldKey.isEmpty()) {
 			String undefinedField = this.selectedFields.get(Integer.parseInt(undefinedFieldKey)).getDefinition();
 			throw new IllegalStateException("Selected field not found: '" + undefinedField +
@@ -274,13 +274,11 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		}
 		StringJoiner clause = new StringJoiner(", ");
 		for (int i = 0; i < fields.length; i++) {
-			this.selectedFields.add(fields[i]);
 			if (fields[i] instanceof SqlScalarSubquery<?> subquery) {
 				this.values.addAll(subquery.getValues());
-				clause.add(subquery.getDefinition());
-			} else {
-				clause.add("${" + i + "}");
 			}
+			this.selectedFields.add(fields[i]);
+			clause.add("${" + i + "}");
 		}
 		return clause.toString();
 	}

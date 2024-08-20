@@ -4,5 +4,5 @@ import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 
 public interface SqlSubquery extends SelectStatement<SqlSubquery>, DbTableLike {
-	<T> DbComparableField<T> getField(int fieldIndex, Class<T> type);
+	<T> DbComparableField<T> getField(DbComparableField<T> field);
 }

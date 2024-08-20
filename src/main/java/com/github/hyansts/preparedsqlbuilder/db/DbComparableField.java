@@ -113,4 +113,5 @@ public interface DbComparableField<T> extends DbFieldLike {
 		return new SqlCondition(this, NOT_IN, subquery);
 	}
 
+	DbComparableField<T> mapTo(DbTableLike tableLike);
 }

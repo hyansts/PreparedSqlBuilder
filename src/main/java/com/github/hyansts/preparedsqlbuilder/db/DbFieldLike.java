@@ -11,8 +11,6 @@ public interface DbFieldLike {
 
 	DbTableLike getTableLike();
 
-	<T> DbComparableField<T> mapTo(DbTableLike tableLike, Class<T> type);
-
 	SqlSortOrder getSortOrder();
 
 	DbFieldLike as(String alias);

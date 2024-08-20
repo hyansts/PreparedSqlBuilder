@@ -33,8 +33,8 @@ class SqlSubqueryBuilder extends BaseSqlBuilder<SqlSubquery> implements SqlSubqu
 	}
 
 	@Override
-	public <T> DbComparableField<T> getField(int fieldIndex, Class<T> type) {
-		return this.selectedFields.get(fieldIndex).mapTo(this, type);
+	public <T> DbComparableField<T> getField(DbComparableField<T> field) {
+		return field.mapTo(this);
 	}
 
 	@Override
