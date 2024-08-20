@@ -23,7 +23,7 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 	@Override
 	public String getFullQualification() {
 		return this.tableLike == null || this.tableLike.getAlias() == null || tableLike.getAlias().isBlank()
-					   ? "(" + this.getSql() + ")" : this.tableLike.getAlias() + "." + this.getLabel();
+					   ? this.getSql() : this.tableLike.getAlias() + "." + this.getLabel();
 	}
 
 	@Override
@@ -75,4 +75,10 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 	public SqlScalarSubquery<T> getQuery() {
 		return this;
 	}
+
+	@Override
+	public String getSql() {
+		return "(" + super.getSql() + ")";
+	}
+
 }

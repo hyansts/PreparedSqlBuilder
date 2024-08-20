@@ -26,6 +26,7 @@ import com.github.hyansts.preparedsqlbuilder.query.UnionStep;
 import com.github.hyansts.preparedsqlbuilder.query.WhereStep;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
+import com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword;
 import com.github.hyansts.preparedsqlbuilder.util.StringTemplateFormatter;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
@@ -206,43 +207,37 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 
 	@Override
 	public UnionStep<T> union(CombinableQuery<T> query) {
-		this.values.addAll(query.getValues());
-		this.sql.append(UNION).append(query);
+		combineQuery(UNION, query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> unionAll(CombinableQuery<T> query) {
-		this.values.addAll(query.getValues());
-		this.sql.append(UNION_ALL).append(query);
+		combineQuery(UNION_ALL, query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> intersect(CombinableQuery<T> query) {
-		this.values.addAll(query.getValues());
-		this.sql.append(INTERSECT).append(query);
+		combineQuery(INTERSECT, query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> intersectAll(CombinableQuery<T> query) {
-		this.values.addAll(query.getValues());
-		this.sql.append(INTERSECT_ALL).append(query);
+		combineQuery(INTERSECT_ALL, query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> except(CombinableQuery<T> query) {
-		this.values.addAll(query.getValues());
-		this.sql.append(EXCEPT).append(query);
+		combineQuery(EXCEPT, query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> exceptAll(CombinableQuery<T> query) {
-		this.values.addAll(query.getValues());
-		this.sql.append(EXCEPT_ALL).append(query);
+		combineQuery(EXCEPT_ALL, query);
 		return this;
 	}
 
@@ -303,6 +298,13 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		String formattedSql = formatter.format(this.sql.toString());
 		this.sql.delete(0, this.sql.length());
 		this.sql.append(formattedSql);
+	}
+
+	private void combineQuery(SqlKeyword keyword, CombinableQuery<T> query) {
+		String sql = getSql();
+		this.sql.delete(0, this.sql.length());
+		this.sql.append(sql).append(keyword).append(query);
+		this.values.addAll(query.getValues());
 	}
 
 }

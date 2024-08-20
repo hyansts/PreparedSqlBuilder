@@ -23,7 +23,7 @@ class SqlSubqueryBuilder extends BaseSqlBuilder<SqlSubquery> implements SqlSubqu
 		if (this.alias == null || this.alias.isBlank()) {
 			throw new IllegalStateException("Cannot leave a derived table subquery with an empty alias: " + this.getSql());
 		}
-		return "(" + this.getSql() + ")" + AS + this.alias;
+		return this.getSql() + AS + this.alias;
 	}
 
 	@Override
@@ -36,8 +36,15 @@ class SqlSubqueryBuilder extends BaseSqlBuilder<SqlSubquery> implements SqlSubqu
 	public <T> DbComparableField<T> getField(int fieldIndex, Class<T> type) {
 		return this.selectedFields.get(fieldIndex).mapTo(this, type);
 	}
+
 	@Override
 	public SqlSubquery getQuery() {
 		return this;
 	}
+
+	@Override
+	public String getSql() {
+		return "(" + super.getSql() + ")";
+	}
+
 }
