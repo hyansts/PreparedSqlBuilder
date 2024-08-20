@@ -5,7 +5,12 @@ import org.junit.jupiter.api.Test;
 public class SqlScalarSubqueryBuilderTest {
 
 	@Test
-	public void test() {
+	public void testSelectWithSubquery() {
+		//TODO
+	}
+
+	@Test
+	public void testConditionalSubquery() {
 		//TODO
 	}
 

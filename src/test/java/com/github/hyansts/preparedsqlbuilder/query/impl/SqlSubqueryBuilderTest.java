@@ -36,8 +36,6 @@ public class SqlSubqueryBuilderTest {
 
 	@Test
 	public void testDerivedTableSubquery() {
-		SqlQuery query = SqlQueryFactory.createQuery();
-		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
 		EmployeesDbTable subEmp = new EmployeesDbTable();
 		DepartmentDbTable subDep = new DepartmentDbTable();
@@ -47,9 +45,12 @@ public class SqlSubqueryBuilderTest {
 		final String title = "A%";
 		final int adminId = 1000;
 
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+
 		subquery.select(subEmp.id.count().as("id_count"), subEmp.department_id, subDep.title.as("dep_name"))
-				.from(subEmp.as("subEmp"))
-				.innerJoin(subDep.as("subDep"))
+				.from(subEmp.as("subemp"))
+				.innerJoin(subDep.as("subdep"))
 				.on(subEmp.department_id.eq(subDep.id))
 				.where(subDep.id.gt(departmentId))
 				.groupBy(subEmp.department_id, subDep.title)
@@ -68,13 +69,13 @@ public class SqlSubqueryBuilderTest {
 
 		String expectedSQL = "SELECT emp.id_count, dep.title, dep.admin_id AS dep_admin " +
 									 "FROM ("
-									 + "SELECT COUNT(subEmp.id) AS id_count, subEmp.department_id, subDep.title AS dep_name "
-									 + "FROM employees AS subEmp "
-									 + "INNER JOIN department AS subDep "
-									 + "ON subEmp.department_id = subDep.id "
-									 + "WHERE subDep.id > ? "
-									 + "GROUP BY subEmp.department_id, subDep.title "
-									 + "HAVING subDep.title LIKE ?) AS emp " +
+									 + "SELECT COUNT(subemp.id) AS id_count, subemp.department_id, subdep.title AS dep_name "
+									 + "FROM employees AS subemp "
+									 + "INNER JOIN department AS subdep "
+									 + "ON subemp.department_id = subdep.id "
+									 + "WHERE subdep.id > ? "
+									 + "GROUP BY subemp.department_id, subdep.title "
+									 + "HAVING subdep.title LIKE ?) AS emp " +
 									 "INNER JOIN department AS dep " +
 									 "ON emp.department_id = dep.id " +
 									 "WHERE dep.admin_id >= ? " +
@@ -86,12 +87,59 @@ public class SqlSubqueryBuilderTest {
 	}
 
 	@Test
-	public void testSelectWithSubquery() {
+	public void testDerivedTableSubqueryChaining() {
+
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+
+		DbFieldLike max_age = emp.age.max().as("max_age");
+
+		query.select(emp.department_id.mapTo(subquery, Integer.class), max_age.mapTo(subquery, Integer.class), dep.title)
+			 .from(subquery.select(emp.department_id, max_age)
+						   .from(emp)
+						   .groupBy(emp.department_id).getQuery().as("dtemp"))
+			 .innerJoin(dep.as("dep")).on(emp.department_id.mapTo(subquery, Integer.class).eq(dep.id));
+
+		String expectedSQL = "SELECT dtemp.department_id, dtemp.max_age, dep.title " +
+									 "FROM ("
+									 + "SELECT department_id, MAX(age) AS max_age "
+									 + "FROM employees "
+									 + "GROUP BY department_id) AS dtemp " +
+									 "INNER JOIN department AS dep " +
+									 "ON dtemp.department_id = dep.id";
+		assertEquals(expectedSQL, query.getSql());
+	}
+
+	@Test
+	public void testDerivedTableSubqueryChainingWithFieldAlias() {
 		//TODO
 	}
 
 	@Test
-	public void testConditionalSubquery() {
+	public void testInnerJoinSubquery() {
+		//TODO
+	}
+
+	@Test
+	public void testLeftJoinSubquery() {
+		//TODO
+	}
+
+	@Test
+	public void testRightJoinSubquery() {
+		//TODO
+	}
+
+	@Test
+	public void testFullJoinSubquery() {
+		//TODO
+	}
+
+	@Test
+	public void testCrossJoinSubquery() {
 		//TODO
 	}
 
@@ -99,4 +147,5 @@ public class SqlSubqueryBuilderTest {
 	public void testCombiningSubquery() {
 		//TODO union of subqueries
 	}
+
 }
