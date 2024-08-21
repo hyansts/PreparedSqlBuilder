@@ -11,6 +11,8 @@ import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SqlSubqueryBuilderTest {
 
@@ -89,7 +91,7 @@ public class SqlSubqueryBuilderTest {
 	}
 
 	@Test
-	public void testDerivedTableSubqueryChaining() {
+	public void testSubqueryChaining() {
 
 		EmployeesDbTable emp = new EmployeesDbTable();
 		DepartmentDbTable dep = new DepartmentDbTable();
@@ -102,47 +104,95 @@ public class SqlSubqueryBuilderTest {
 		query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
 			 .from(subquery.select(emp.department_id, maxAge.as("max_age"))
 						   .from(emp)
-						   .groupBy(emp.department_id).getQuery().as("dtemp"))
-			 .innerJoin(dep.as("dep")).on(emp.department_id.mapTo(subquery).eq(dep.id));
+						   .groupBy(emp.department_id).getQuery().as("sub"))
+			 .innerJoin(dep.as("dep")).on(subquery.getField(emp.department_id).eq(dep.id));
 
-		String expectedSQL = "SELECT dtemp.department_id, dtemp.max_age, dep.title " +
+		String expectedSQL = "SELECT sub.department_id, sub.max_age, dep.title " +
 									 "FROM ("
 									 + "SELECT department_id, MAX(age) AS max_age "
 									 + "FROM employees "
-									 + "GROUP BY department_id) AS dtemp " +
+									 + "GROUP BY department_id) AS sub " +
 									 "INNER JOIN department AS dep " +
-									 "ON dtemp.department_id = dep.id";
+									 "ON sub.department_id = dep.id";
+
 		assertEquals(expectedSQL, query.getSql());
 	}
 
 	@Test
-	public void testDerivedTableSubqueryChainingWithFieldAlias() {
-		//TODO
+	public void testSubqueryChainingWithFieldAlias() {
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+
+		DbTableField<Integer> maxAge = emp.age.max();
+
+		query.select(subquery.getField(emp.department_id).as("dep_id"), subquery.getField(maxAge), dep.title.as("title"))
+			 .from(subquery.select(emp.department_id.as("id"), maxAge.as("max_age"))
+						   .from(emp)
+						   .groupBy(emp.department_id).getQuery().as("sub"))
+			 .innerJoin(dep.as("dep")).on(subquery.getField(emp.department_id).eq(dep.id));
+
+		String expectedSQL = "SELECT sub.id AS dep_id, sub.max_age, dep.title AS title " +
+									 "FROM ("
+									 + "SELECT department_id AS id, MAX(age) AS max_age "
+									 + "FROM employees "
+									 + "GROUP BY department_id) AS sub " +
+									 "INNER JOIN department AS dep " +
+									 "ON sub.id = dep.id";
+
+		assertEquals(expectedSQL, query.getSql());
 	}
 
 	@Test
-	public void testInnerJoinSubquery() {
-		//TODO
+	public void testReferenceSubqueryWithNoAlias() {
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+
+		DbTableField<Integer> maxAge = emp.age.max();
+
+		Exception exception = assertThrows(IllegalStateException.class, () -> {
+			query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
+				 .from(subquery.select(emp.department_id, maxAge.as("max_age"))
+							   .from(emp)
+							   .groupBy(emp.department_id))
+				 .innerJoin(dep.as("dep")).on(subquery.getField(emp.department_id).eq(dep.id));
+		});
+
+		assertTrue(exception.getMessage().contains("Cannot leave a derived table subquery with an empty alias"));
 	}
 
 	@Test
-	public void testLeftJoinSubquery() {
-		//TODO
-	}
+	public void testJoinSubquery() {
 
-	@Test
-	public void testRightJoinSubquery() {
-		//TODO
-	}
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
 
-	@Test
-	public void testFullJoinSubquery() {
-		//TODO
-	}
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-	@Test
-	public void testCrossJoinSubquery() {
-		//TODO
+		DbTableField<Integer> maxAge = emp.age.max();
+
+		query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
+			 .from(dep.as("dep"))
+			 .innerJoin(subquery.select(emp.department_id, maxAge.as("max_age"))
+								.from(emp)
+								.groupBy(emp.department_id).getQuery().as("sub"))
+			 .on(subquery.getField(emp.department_id).eq(dep.id));
+
+		String expectedSQL = "SELECT sub.department_id, sub.max_age, dep.title " +
+									 "FROM department AS dep " +
+									 "INNER JOIN ("
+									 + "SELECT department_id, MAX(age) AS max_age "
+									 + "FROM employees "
+									 + "GROUP BY department_id) AS sub " +
+									 "ON sub.department_id = dep.id";
+
+		assertEquals(expectedSQL, query.getSql());
 	}
 
 	@Test
