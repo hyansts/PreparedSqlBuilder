@@ -39,4 +39,5 @@ public class SqlScalar {
 		}
 		return joiner.toString();
 	}
+
 }

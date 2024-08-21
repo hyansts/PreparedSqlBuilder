@@ -21,4 +21,5 @@ public class DbTableFieldValue<T> implements DbFieldValue<T> {
 	public T getValue() {
 		return this.value;
 	}
+
 }

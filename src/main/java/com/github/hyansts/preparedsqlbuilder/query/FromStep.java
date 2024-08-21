@@ -1,7 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbField;
-import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
@@ -30,7 +30,7 @@ public interface FromStep<T> extends CombiningOperation<T> {
 
 	GroupByStep<T> groupBy(DbField... fields);
 
-	OrderByStep<T> orderBy(DbFieldLike... fields);
+	OrderByStep<T> orderBy(DbFieldOrder... fields);
 
 	LimitStep<T> limit(Integer number);
 }

@@ -5,6 +5,7 @@ import java.util.function.Function;
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbField;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbWritableField;
@@ -19,18 +20,18 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	private final StringHolder fieldName;
 	private final StringHolder alias = new StringHolder();
 	private final DbTableLike table;
-
-	private SqlSortOrder sortOrder;
-	private Function<String, String> aggregateFunction;
+	private final Function<String, String> aggregateFunction;
 
 	public DbTableField(String name, DbTableLike table) {
 		this.fieldName = new StringHolder(name);
 		this.table = table;
+		this.aggregateFunction = null;
 	}
 
 	private DbTableField(StringHolder name, DbTableLike table) {
 		this.fieldName = name;
 		this.table = table;
+		this.aggregateFunction = null;
 	}
 
 	private DbTableField(StringHolder name, DbTableLike table, Function<String, String> aggregateFunction) {
@@ -60,15 +61,13 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	}
 
 	@Override
-	public DbFieldLike asc() {
-		this.sortOrder = SqlSortOrder.ASC;
-		return this;
+	public DbFieldOrder asc() {
+		return new DbTableFieldOrder(getLabel(), SqlSortOrder.ASC);
 	}
 
 	@Override
-	public DbFieldLike desc() {
-		this.sortOrder = SqlSortOrder.DESC;
-		return this;
+	public DbFieldOrder desc() {
+		return new DbTableFieldOrder(getLabel(), SqlSortOrder.DESC);
 	}
 
 	@Override
@@ -115,8 +114,6 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	}
 
 	@Override
-	public SqlSortOrder getSortOrder() { return this.sortOrder; }
-
-	@Override
 	public String toString() { return this.getLabel(); }
+
 }

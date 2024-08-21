@@ -99,4 +99,5 @@ public class SqlConditionTest {
 		assertEquals(expected, result.getSql());
 		assertEquals(expectedValues, result.getComparedValues());
 	}
+
 }

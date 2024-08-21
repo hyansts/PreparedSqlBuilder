@@ -2,7 +2,9 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
+import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 import com.github.hyansts.preparedsqlbuilder.util.StringHolder;
@@ -13,7 +15,6 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 
 	private final StringHolder alias;
 	private final DbTableLike tableLike;
-	private SqlSortOrder sortOrder;
 
 	public SqlScalarSubqueryBuilder() {
 		this.alias = new StringHolder();
@@ -56,19 +57,14 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 	}
 
 	@Override
-	public DbFieldLike asc() {
-		this.sortOrder = SqlSortOrder.ASC;
-		return this;
+	public DbFieldOrder asc() {
+		return new DbTableFieldOrder(getLabel(), SqlSortOrder.ASC);
 	}
 
 	@Override
-	public DbFieldLike desc() {
-		this.sortOrder = SqlSortOrder.DESC;
-		return this;
+	public DbFieldOrder desc() {
+		return new DbTableFieldOrder(getLabel(), SqlSortOrder.DESC);
 	}
-
-	@Override
-	public SqlSortOrder getSortOrder() { return sortOrder; }
 
 	@Override
 	public DbComparableField<T> mapTo(DbTableLike tableLike) {

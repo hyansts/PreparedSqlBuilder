@@ -2,7 +2,6 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import java.util.List;
 
-import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
@@ -478,9 +477,9 @@ public class BaseSqlBuilderTest {
 		final String title = "A%";
 		final int departmentId = 10;
 
-		DbFieldLike emp_count = emp.id.count().as("emp_count");
+		DbTableField<Long> emp_count = emp.id.count();
 
-		query.select(emp_count, dep.title.as("dep_name"))
+		query.select(emp_count.as("emp_count"), dep.title.as("dep_name"))
 			 .from(emp.as("emp"))
 			 .innerJoin(dep.as("dep"))
 			 .on(emp.department_id.eq(dep.id))
@@ -516,4 +515,5 @@ public class BaseSqlBuilderTest {
 		assertEquals(expectedSQL, query.getSql());
 		assertEquals(List.of(isActive, age, title, departmentId), query.getValues());
 	}
+
 }

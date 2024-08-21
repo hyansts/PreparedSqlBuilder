@@ -8,6 +8,7 @@ import java.util.StringJoiner;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbField;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
+import com.github.hyansts.preparedsqlbuilder.db.DbFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.query.CombinableQuery;
 import com.github.hyansts.preparedsqlbuilder.query.CombiningOperation;
@@ -183,11 +184,10 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	}
 
 	@Override
-	public OrderByStep<T> orderBy(DbFieldLike... fields) {
+	public OrderByStep<T> orderBy(DbFieldOrder... fieldOrders) {
 		StringJoiner joinedFields = new StringJoiner(", ");
-		for (var field : fields) {
-			String sortOrder = field.getSortOrder() != null ? field.getSortOrder().toString() : "";
-			joinedFields.add(field.getLabel() + sortOrder);
+		for (var fieldOrder : fieldOrders) {
+			joinedFields.add(fieldOrder.getDefinition());
 		}
 		this.sql.append(ORDER_BY).append(joinedFields);
 		return this;

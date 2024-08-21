@@ -16,4 +16,5 @@ public abstract class SqlQueryFactory {
 	public static <T> SqlScalarSubquery<T> createScalarSubquery() {
 		return new SqlScalarSubqueryBuilder<>();
 	}
+
 }

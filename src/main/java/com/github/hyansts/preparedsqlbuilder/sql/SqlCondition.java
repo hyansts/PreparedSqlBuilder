@@ -82,4 +82,5 @@ public class SqlCondition {
 	public String toString() {
 		return getSql();
 	}
+
 }

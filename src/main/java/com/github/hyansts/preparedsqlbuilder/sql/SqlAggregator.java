@@ -9,5 +9,5 @@ public class SqlAggregator {
 	public static String min(String field) { return "MIN(" + field + ")"; }
 	public static String sum(String field) { return "SUM(" + field + ")"; }
 	public static String count(String field) { return "COUNT(" + field + ")"; }
-}
 
+}

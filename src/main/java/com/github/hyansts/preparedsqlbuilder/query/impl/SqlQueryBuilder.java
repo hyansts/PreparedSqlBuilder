@@ -79,4 +79,5 @@ class SqlQueryBuilder extends BaseSqlBuilder<SqlQuery> implements SqlQuery, Upda
 	public SqlQuery getQuery() {
 		return this;
 	}
+
 }
