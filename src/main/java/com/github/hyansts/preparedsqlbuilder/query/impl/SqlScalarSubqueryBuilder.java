@@ -40,7 +40,7 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 	@Override
 	public String getLabel() {
 		if (this.alias.isBlank()) {
-			throw new IllegalStateException("Cannot reference a subquery with an empty alias: " + this.getSql());
+			throw new IllegalStateException("Subquery must have an alias to be referenced: " + this.getSql());
 		}
 		return this.alias.getValue();
 	}

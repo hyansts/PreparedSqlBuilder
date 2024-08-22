@@ -18,7 +18,7 @@ class SqlSubqueryBuilder extends BaseSqlBuilder<SqlSubquery> implements SqlSubqu
 	@Override
 	public String getDefinition() {
 		if (this.alias == null || this.alias.isBlank()) {
-			throw new IllegalStateException("Cannot leave a derived table subquery with an empty alias: " + this.getSql());
+			throw new IllegalStateException("Derived table subquery must have an alias: " + this.getSql());
 		}
 		return this.getSql() + AS + this.alias;
 	}

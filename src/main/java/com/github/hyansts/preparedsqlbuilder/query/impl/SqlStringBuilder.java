@@ -59,7 +59,7 @@ public class SqlStringBuilder {
 	 * @return the current instance of {@code SqlStringBuilder} with the appended SELECT COUNT clause.
 	 */
 	public SqlStringBuilder selectCount(String field) {
-		this.sql.append(SELECT).append(SqlAggregator.count(field));
+		this.sql.append(SELECT).append(SqlAggregator.COUNT.applyTo(field));
 		return this;
 	}
 

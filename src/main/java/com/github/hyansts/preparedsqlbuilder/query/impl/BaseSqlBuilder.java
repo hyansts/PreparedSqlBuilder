@@ -70,13 +70,13 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 
 	@Override
 	public SelectStep<T> selectCount(DbField field) {
-		this.sql.append(SELECT).append(SqlAggregator.count(field.getFullQualification()));
+		this.sql.append(SELECT).append(SqlAggregator.COUNT.applyTo(field.getFullQualification()));
 		return this;
 	}
 
 	@Override
 	public SelectStep<T> selectCount() {
-		this.sql.append(SELECT).append(SqlAggregator.count("*"));
+		this.sql.append(SELECT).append(SqlAggregator.COUNT.applyTo("*"));
 		return this;
 	}
 
@@ -259,8 +259,8 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		String undefinedFieldKey = new StringTemplateFormatter().findFirstKey(this.sql.toString());
 		if (undefinedFieldKey != null && !undefinedFieldKey.isEmpty()) {
 			String undefinedField = this.selectedFields.get(Integer.parseInt(undefinedFieldKey)).getDefinition();
-			throw new IllegalStateException("Selected field not found: '" + undefinedField +
-													"' doesn't belong to any table defined in the FROM or JOIN clause.");
+			throw new IllegalStateException("Selected field was not found in any table in the FROM or JOIN clauses: "
+													+ undefinedField);
 		}
 		return this.sql.toString();
 	}

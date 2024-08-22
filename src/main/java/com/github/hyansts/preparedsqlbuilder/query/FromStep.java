@@ -30,6 +30,8 @@ public interface FromStep<T> extends CombiningOperation<T> {
 
 	GroupByStep<T> groupBy(DbField... fields);
 
+	HavingStep<T> having(SqlCondition sqlCondition);
+
 	OrderByStep<T> orderBy(DbFieldOrder... fields);
 
 	LimitStep<T> limit(Integer number);

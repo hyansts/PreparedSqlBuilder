@@ -3,6 +3,7 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 import java.util.List;
 
 import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
+import com.github.hyansts.preparedsqlbuilder.db.impl.DbAggregateField;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 
@@ -477,7 +478,7 @@ public class BaseSqlBuilderTest {
 		final String title = "A%";
 		final int departmentId = 10;
 
-		DbTableField<Long> emp_count = emp.id.count();
+		DbAggregateField<Long> emp_count = emp.id.count();
 
 		query.select(emp_count.as("emp_count"), dep.title.as("dep_name"))
 			 .from(emp.as("emp"))

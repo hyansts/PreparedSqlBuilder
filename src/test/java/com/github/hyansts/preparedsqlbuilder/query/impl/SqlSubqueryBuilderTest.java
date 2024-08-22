@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.impl.BaseDbTable;
+import com.github.hyansts.preparedsqlbuilder.db.impl.DbAggregateField;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
@@ -50,7 +51,7 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		DbTableField<Long> id_count = subEmp.id.count();
+		DbAggregateField<Long> id_count = subEmp.id.count();
 
 		subquery.select(id_count.as("id_count"), subEmp.department_id, subDep.title.as("dep_name"))
 				.from(subEmp.as("subemp"))
@@ -99,7 +100,7 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		DbTableField<Integer> maxAge = emp.age.max();
+		DbAggregateField<Integer> maxAge = emp.age.max();
 
 		query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
 			 .from(subquery.select(emp.department_id, maxAge.as("max_age"))
@@ -126,7 +127,7 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		DbTableField<Integer> maxAge = emp.age.max();
+		DbAggregateField<Integer> maxAge = emp.age.max();
 
 		query.select(subquery.getField(emp.department_id).as("dep_id"), subquery.getField(maxAge), dep.title.as("title"))
 			 .from(subquery.select(emp.department_id.as("id"), maxAge.as("max_age"))
@@ -153,7 +154,7 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		DbTableField<Integer> maxAge = emp.age.max();
+		DbAggregateField<Integer> maxAge = emp.age.max();
 
 		Exception exception = assertThrows(IllegalStateException.class, () -> {
 			query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
@@ -163,7 +164,34 @@ public class SqlSubqueryBuilderTest {
 				 .innerJoin(dep.as("dep")).on(subquery.getField(emp.department_id).eq(dep.id));
 		});
 
-		assertTrue(exception.getMessage().contains("Cannot leave a derived table subquery with an empty alias"));
+		assertTrue(exception.getMessage().contains("Derived table subquery must have an alias"));
+	}
+
+	@Test
+	public void testSubqueryAggregateFieldWithNoAlias() {
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+
+		DbAggregateField<Integer> maxAge = emp.age.max();
+
+		query.select(subquery.getField(emp.department_id).as("dep_id"), subquery.getField(maxAge), dep.title.as("title"))
+			 .from(subquery.select(emp.department_id.as("id"), maxAge)
+						   .from(emp.as("emp"))
+						   .groupBy(emp.department_id).getQuery().as("sub"))
+			 .innerJoin(dep.as("dep")).on(subquery.getField(emp.department_id).eq(dep.id));
+
+		String expectedSQL = "SELECT sub.id AS dep_id, sub.max_age, dep.title AS title " +
+									 "FROM ("
+									 + "SELECT emp.department_id AS id, MAX(emp.age) "
+									 + "FROM employees AS emp "
+									 + "GROUP BY emp.department_id) AS sub " +
+									 "INNER JOIN department AS dep " +
+									 "ON sub.id = dep.id";
+
+		assertEquals(expectedSQL, query.getSql());
 	}
 
 	@Test
@@ -175,7 +203,7 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
-		DbTableField<Integer> maxAge = emp.age.max();
+		DbAggregateField<Integer> maxAge = emp.age.max();
 
 		query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
 			 .from(dep.as("dep"))

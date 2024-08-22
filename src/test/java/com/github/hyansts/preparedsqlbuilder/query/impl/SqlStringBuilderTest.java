@@ -172,7 +172,7 @@ public class SqlStringBuilderTest {
 	public void testGroupByClause() {
 
 		SqlStringBuilder query = new SqlStringBuilder();
-		query.select("role", "salary", SqlAggregator.count("*"))
+		query.select("role", "salary", SqlAggregator.COUNT.applyTo("*"))
 			 .from("employees")
 			 .groupBy("role", "salary");
 
@@ -184,7 +184,7 @@ public class SqlStringBuilderTest {
 	public void testHavingClause() {
 
 		SqlStringBuilder query = new SqlStringBuilder();
-		query.select("role", "salary", SqlAggregator.count("*"))
+		query.select("role", "salary", SqlAggregator.COUNT.applyTo("*"))
 			 .from("employees")
 			 .groupBy("role", "salary")
 			 .having("salary > 5000");
