@@ -20,9 +20,7 @@ public class SqlSubqueryBuilderTest {
 	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
 
 		public final DbTableField<Integer> id = new DbTableField<>("id", this);
-		public final DbTableField<String> name = new DbTableField<>("name", this);
 		public final DbTableField<Integer> age = new DbTableField<>("age", this);
-		public final DbTableField<Boolean> is_active = new DbTableField<>("is_active", this);
 		public final DbTableField<Integer> department_id = new DbTableField<>("department_id", this);
 
 		public EmployeesDbTable() { super("employees"); }
@@ -160,7 +158,8 @@ public class SqlSubqueryBuilderTest {
 			query.select(subquery.getField(emp.department_id), subquery.getField(maxAge), dep.title)
 				 .from(subquery.select(emp.department_id, maxAge.as("max_age"))
 							   .from(emp)
-							   .groupBy(emp.department_id))
+							   .groupBy(emp.department_id)
+							   .getQuery())
 				 .innerJoin(dep.as("dep")).on(subquery.getField(emp.department_id).eq(dep.id));
 		});
 
@@ -224,8 +223,63 @@ public class SqlSubqueryBuilderTest {
 	}
 
 	@Test
-	public void testCombiningSubquery() {
-		//TODO union of subqueries
+	public void testCombiningSubqueries() {
+
+		EmployeesDbTable emp = new EmployeesDbTable();
+		EmployeesDbTable emp2 = new EmployeesDbTable();
+
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+		SqlSubquery subquery2 = SqlQueryFactory.createSubquery();
+
+		subquery.select(emp.id)
+				.from(emp)
+				.orderBy(emp.id.desc())
+				.limit(10)
+				.offset(10)
+				.union(subquery2.select(emp2.id)
+								.from(emp2)
+								.orderBy(emp2.id.desc())
+								.limit(10)
+								.offset(90));
+
+		String expectedSQL = "(SELECT id FROM employees ORDER BY id DESC LIMIT 10 OFFSET 10 " +
+									 "UNION " +
+									 "SELECT id FROM employees ORDER BY id DESC LIMIT 10 OFFSET 90)";
+
+		assertEquals(expectedSQL, subquery.getSql());
+	}
+
+	@Test
+	public void testCombiningMultipleSubqueries() {
+
+		EmployeesDbTable emp = new EmployeesDbTable();
+		EmployeesDbTable emp2 = new EmployeesDbTable();
+		EmployeesDbTable emp3 = new EmployeesDbTable();
+
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+		SqlSubquery subquery2 = SqlQueryFactory.createSubquery();
+		SqlSubquery subquery3 = SqlQueryFactory.createSubquery();
+
+		subquery.select(emp.id)
+				.from(emp)
+				.limit(10)
+				.offset(10)
+				.union(subquery2.select(emp2.id)
+								.from(emp2)
+								.limit(10)
+								.offset(50))
+				.union(subquery3.select(emp3.id)
+								.from(emp3)
+								.limit(10)
+								.offset(90));
+
+		String expectedSQL = "(SELECT id FROM employees LIMIT 10 OFFSET 10 " +
+									 "UNION " +
+									 "SELECT id FROM employees LIMIT 10 OFFSET 50 " +
+									 "UNION " +
+									 "SELECT id FROM employees LIMIT 10 OFFSET 90)";
+
+		assertEquals(expectedSQL, subquery.getSql());
 	}
 
 }

@@ -27,7 +27,6 @@ import com.github.hyansts.preparedsqlbuilder.query.UnionStep;
 import com.github.hyansts.preparedsqlbuilder.query.WhereStep;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
-import com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword;
 import com.github.hyansts.preparedsqlbuilder.util.StringTemplateFormatter;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
@@ -88,11 +87,6 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	}
 
 	@Override
-	public FromStep<T> from(CombinableQuery<SqlSubquery> tableLike) {
-		return from((DbTableLike) tableLike);
-	}
-
-	@Override
 	public WhereStep<T> where(SqlCondition condition) {
 		this.values.addAll(condition.getComparedValues());
 		this.sql.append(WHERE).append(condition);
@@ -107,20 +101,10 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	}
 
 	@Override
-	public JoinStep<T> innerJoin(CombinableQuery<SqlSubquery> tableLike) {
-		return innerJoin((DbTableLike) tableLike);
-	}
-
-	@Override
 	public JoinStep<T> leftJoin(DbTableLike table) {
 		this.sql.append(LEFT_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
-	}
-
-	@Override
-	public JoinStep<T> leftJoin(CombinableQuery<SqlSubquery> tableLike) {
-		return leftJoin((DbTableLike) tableLike);
 	}
 
 	@Override
@@ -131,11 +115,6 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	}
 
 	@Override
-	public JoinStep<T> rightJoin(CombinableQuery<SqlSubquery> tableLike) {
-		return rightJoin((DbTableLike) tableLike);
-	}
-
-	@Override
 	public JoinStep<T> fullJoin(DbTableLike table) {
 		this.sql.append(FULL_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
@@ -143,20 +122,10 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	}
 
 	@Override
-	public JoinStep<T> fullJoin(CombinableQuery<SqlSubquery> tableLike) {
-		return fullJoin((DbTableLike) tableLike);
-	}
-
-	@Override
 	public FromStep<T> crossJoin(DbTableLike table) {
 		this.sql.append(CROSS_JOIN).append(table.getDefinition());
 		processFieldDefinition(table);
 		return this;
-	}
-
-	@Override
-	public FromStep<T> crossJoin(CombinableQuery<SqlSubquery> tableLike) {
-		return crossJoin((DbTableLike) tableLike);
 	}
 
 	@Override
@@ -207,37 +176,43 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 
 	@Override
 	public UnionStep<T> union(CombinableQuery<T> query) {
-		combineQuery(UNION, query);
+		this.values.addAll(query.getValues());
+		this.sql.append(UNION).append(query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> unionAll(CombinableQuery<T> query) {
-		combineQuery(UNION_ALL, query);
+		this.values.addAll(query.getValues());
+		this.sql.append(UNION_ALL).append(query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> intersect(CombinableQuery<T> query) {
-		combineQuery(INTERSECT, query);
+		this.values.addAll(query.getValues());
+		this.sql.append(INTERSECT).append(query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> intersectAll(CombinableQuery<T> query) {
-		combineQuery(INTERSECT_ALL, query);
+		this.values.addAll(query.getValues());
+		this.sql.append(INTERSECT_ALL).append(query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> except(CombinableQuery<T> query) {
-		combineQuery(EXCEPT, query);
+		this.values.addAll(query.getValues());
+		this.sql.append(EXCEPT).append(query);
 		return this;
 	}
 
 	@Override
 	public UnionStep<T> exceptAll(CombinableQuery<T> query) {
-		combineQuery(EXCEPT_ALL, query);
+		this.values.addAll(query.getValues());
+		this.sql.append(EXCEPT_ALL).append(query);
 		return this;
 	}
 
@@ -252,23 +227,30 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	@Override
 	public List<Object> getValues() { return values; }
 
-	//TODO test this exception
 	@Override
 	public String getSql() {
 		processFieldDefinition(null);
-		String undefinedFieldKey = new StringTemplateFormatter().findFirstKey(this.sql.toString());
-		if (undefinedFieldKey != null && !undefinedFieldKey.isEmpty()) {
-			String undefinedField = this.selectedFields.get(Integer.parseInt(undefinedFieldKey)).getDefinition();
-			throw new IllegalStateException("Selected field was not found in any table in the FROM or JOIN clauses: "
-													+ undefinedField);
-		}
+		validate();
 		return this.sql.toString();
 	}
 
 	@Override
-	public String toString() { return getSql(); }
+	public String toString() {
+		processFieldDefinition(null);
+		return this.sql.toString();
+	}
 
-	private String chainFieldsDefinitions(DbFieldLike... fields) {
+	//TODO test this exception
+	protected void validate() {
+		String undefinedFieldKey = new StringTemplateFormatter().findFirstKey(this.sql.toString());
+		if (undefinedFieldKey != null && !undefinedFieldKey.isEmpty()) {
+			String undefinedField = this.selectedFields.get(Integer.parseInt(undefinedFieldKey)).getDefinition();
+			throw new IllegalStateException("Selected field was not found in any table in the FROM or JOIN clauses: '"
+													+ undefinedField + "'");
+		}
+	}
+
+	protected String chainFieldsDefinitions(DbFieldLike... fields) {
 		if (fields == null || fields.length == 0) {
 			return "*";
 		}
@@ -283,7 +265,7 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		return clause.toString();
 	}
 
-	private void processFieldDefinition(DbTableLike tableLike) {
+	protected void processFieldDefinition(DbTableLike tableLike) {
 		if (tableLike instanceof SqlSubquery subquery) {
 			this.values.addAll(subquery.getValues());
 		}
@@ -296,13 +278,6 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		String formattedSql = formatter.format(this.sql.toString());
 		this.sql.delete(0, this.sql.length());
 		this.sql.append(formattedSql);
-	}
-
-	private void combineQuery(SqlKeyword keyword, CombinableQuery<T> query) {
-		String sql = getSql();
-		this.sql.delete(0, this.sql.length());
-		this.sql.append(sql).append(keyword).append(query);
-		this.values.addAll(query.getValues());
 	}
 
 }
