@@ -7,6 +7,7 @@ import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.*;
 
+//TODO test all of these
 public interface DbComparableField<T> extends DbSortableField {
 
 	default SqlCondition eq(DbComparableField<T> tf) {
@@ -65,12 +66,28 @@ public interface DbComparableField<T> extends DbSortableField {
 		return new SqlCondition(this, BETWEEN, val1, AND, val2);
 	}
 
+	default SqlCondition between(DbComparableField<T> tf, T val) {
+		return new SqlCondition(this, BETWEEN, tf, AND, val);
+	}
+
+	default SqlCondition between(T val, DbComparableField<T> tf) {
+		return new SqlCondition(this, BETWEEN, val, AND, tf);
+	}
+
 	default SqlCondition notBetween(DbComparableField<T> tf1, DbComparableField<T> tf2) {
 		return new SqlCondition(this, NOT_BETWEEN, tf1, AND, tf2);
 	}
 
 	default SqlCondition notBetween(T val1, T val2) {
 		return new SqlCondition(this, NOT_BETWEEN, val1, AND, val2);
+	}
+
+	default SqlCondition notBetween(DbComparableField<T> tf, T val) {
+		return new SqlCondition(this, NOT_BETWEEN, tf, AND, val);
+	}
+
+	default SqlCondition notBetween(T val, DbComparableField<T> tf) {
+		return new SqlCondition(this, NOT_BETWEEN, val, AND, tf);
 	}
 
 	default SqlCondition like(DbComparableField<T> tf) {

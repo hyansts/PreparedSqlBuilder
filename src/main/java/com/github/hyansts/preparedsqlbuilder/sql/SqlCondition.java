@@ -14,10 +14,12 @@ public class SqlCondition {
 	private int parenthesisLayer = 1;
 
 	public SqlCondition(DbComparableField<?> tf, SqlConditionOperator op) {
+		addSubqueryValues(tf);
 		this.sql = tf.getFullQualification() + op;
 	}
 
 	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, DbComparableField<T> tf2) {
+		addSubqueryValues(tf1, tf2);
 		this.sql = tf1.getFullQualification() + op + tf2.getFullQualification();
 	}
 
@@ -32,7 +34,21 @@ public class SqlCondition {
 	}
 
 	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op1, DbComparableField<T> tf2, SqlConditionOperator op2, DbComparableField<T> tf3) {
+		addSubqueryValues(tf1, tf2, tf3);
 		this.sql = tf1.getFullQualification() + op1 + tf2.getFullQualification() + op2 + tf3;
+	}
+
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op1, DbComparableField<T> tf2, SqlConditionOperator op2, T val) {
+		addSubqueryValues(tf1, tf2);
+		this.comparedValues.add(val);
+		this.sql = tf1.getFullQualification() + op1 + tf2.getFullQualification() + op2 + "?";
+	}
+
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op1, T val, SqlConditionOperator op2, DbComparableField<T> tf2) {
+		addSubqueryValues(tf1);
+		this.comparedValues.add(val);
+		addSubqueryValues(tf2);
+		this.sql = tf1.getFullQualification() + op1 + "?" + op2 + tf2.getFullQualification();
 	}
 
 	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, List<T> values) {
@@ -47,12 +63,6 @@ public class SqlCondition {
 		}
 		valueString.append(')');
 		this.sql = tf1.getFullQualification() + op + valueString;
-	}
-
-	//TODO test if this is necessary (SqlScalarSubquery already implements DbComparableField) and test parenthesis
-	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, SqlScalarSubquery<T> subquery) {
-		this.comparedValues.addAll(subquery.getValues());
-		this.sql = tf1.getFullQualification() + op + "(" + subquery + ")";
 	}
 
 	public SqlCondition and(SqlCondition sqlCondition) {
@@ -73,6 +83,14 @@ public class SqlCondition {
 			return "(" + otherCondition.getSql() + ")";
 		}
 		return otherCondition.getSql();
+	}
+
+	private void addSubqueryValues(DbComparableField<?>... fields) {
+		for (DbComparableField<?> field : fields) {
+			if (field instanceof SqlScalarSubquery<?> subquery) {
+				this.comparedValues.addAll(subquery.getValues());
+			}
+		}
 	}
 
 	public List<Object> getComparedValues() { return this.comparedValues; }
