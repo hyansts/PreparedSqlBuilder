@@ -20,7 +20,7 @@ public class DbAggregateField<T> implements DbComparableField<T> {
 	public DbAggregateField(SqlAggregator aggregator, DbField field) {
 		this.aggregator = aggregator;
 		this.field = field;
-		this.alias.setDefaultHolder(new StringHolder((aggregator + "_" + field.getFieldName()).toLowerCase()));
+		this.alias.setValue((aggregator + "_" + field.getFieldName()).toLowerCase());
 	}
 
 	@Override

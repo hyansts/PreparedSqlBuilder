@@ -240,7 +240,6 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		return this.sql.toString();
 	}
 
-	//TODO test this exception
 	protected void validate() {
 		String undefinedFieldKey = new StringTemplateFormatter().findFirstKey(this.sql.toString());
 		if (undefinedFieldKey != null && !undefinedFieldKey.isEmpty()) {

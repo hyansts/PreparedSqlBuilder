@@ -10,6 +10,8 @@ import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BaseSqlBuilderTest {
 
@@ -192,7 +194,7 @@ public class BaseSqlBuilderTest {
 		String expected =
 				"SELECT * FROM employees AS e INNER JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -213,7 +215,7 @@ public class BaseSqlBuilderTest {
 		String expected =
 				"SELECT * FROM employees AS e LEFT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -235,7 +237,7 @@ public class BaseSqlBuilderTest {
 		String expected =
 				"SELECT * FROM employees AS e RIGHT JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -257,7 +259,7 @@ public class BaseSqlBuilderTest {
 		String expected =
 				"SELECT * FROM employees AS e FULL JOIN department AS d ON e.department_id = d.id WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -278,8 +280,23 @@ public class BaseSqlBuilderTest {
 		String expected =
 				"SELECT * FROM employees AS e CROSS JOIN department AS d WHERE d.title = ?";
 		List<Object> expectedValues = List.of(title);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
+	}
+
+	@Test
+	public void testFieldFromWrongTable() {
+
+		EmployeesDbTable tb = new EmployeesDbTable();
+		DepartmentDbTable dtb = new DepartmentDbTable();
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+
+		query.select(dtb.title).from(tb.as("e"));
+
+		Exception exception = assertThrows(IllegalStateException.class, query::getSql);
+
+		assertTrue(exception.getMessage().contains("Selected field was not found in any table in the FROM or JOIN clauses"));
 	}
 
 	@Test
@@ -288,11 +305,11 @@ public class BaseSqlBuilderTest {
 		EmployeesDbTable tb = new EmployeesDbTable();
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(tb.department_id, tb.age, tb.id.count())
+		query.select(tb.department_id, tb.age, tb.id.count().as("count_id"))
 			 .from(tb)
 			 .groupBy(tb.department_id, tb.age);
 
-		String expected = "SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age";
+		String expected = "SELECT department_id, age, COUNT(id) AS count_id FROM employees GROUP BY department_id, age";
 		assertEquals(expected, query.getSql());
 	}
 
@@ -304,14 +321,14 @@ public class BaseSqlBuilderTest {
 		final int age = 30;
 
 		SqlQuery query = SqlQueryFactory.createQuery();
-		query.select(tb.department_id, tb.age, tb.id.count())
+		query.select(tb.department_id, tb.age, tb.id.count().as("count_id"))
 			 .from(tb)
 			 .groupBy(tb.department_id, tb.age)
 			 .having(tb.age.gt(age));
 
 		List<Object> expectedValues = List.of(age);
 		String expected =
-				"SELECT department_id, age, COUNT(id) FROM employees GROUP BY department_id, age HAVING age > ?";
+				"SELECT department_id, age, COUNT(id) AS count_id FROM employees GROUP BY department_id, age HAVING age > ?";
 		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
@@ -489,7 +506,7 @@ public class BaseSqlBuilderTest {
 			 .having(dep.title.like(title))
 			 .limit(10)
 			 .offset(3)
-			 .union(unionQuery.select(uemp.id.max(), udep.title.as("dep_name"))
+			 .union(unionQuery.select(uemp.id.max().as("max_id"), udep.title.as("dep_name"))
 							  .from(uemp.as("uemp"))
 							  .innerJoin(udep.as("udep"))
 							  .on(uemp.department_id.eq(udep.id))
@@ -505,7 +522,7 @@ public class BaseSqlBuilderTest {
 									 "GROUP BY dep.title HAVING dep.title LIKE ? " +
 									 "LIMIT 10 OFFSET 3 " +
 									 "UNION " +
-									 "SELECT MAX(uemp.id), udep.title AS dep_name " +
+									 "SELECT MAX(uemp.id) AS max_id, udep.title AS dep_name " +
 									 "FROM employees AS uemp " +
 									 "INNER JOIN department AS udep " +
 									 "ON uemp.department_id = udep.id " +

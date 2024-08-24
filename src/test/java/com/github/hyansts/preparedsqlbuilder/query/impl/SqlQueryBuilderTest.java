@@ -68,7 +68,7 @@ public class SqlQueryBuilderTest {
 
 		String expectedSQL = "UPDATE employees SET name = ?, age = ?, is_active = ? WHERE id = ?";
 		List<Object> expectedValues = List.of(name, age, isActive, id);
-		assertEquals(expectedSQL, query.toString());
+		assertEquals(expectedSQL, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -85,7 +85,7 @@ public class SqlQueryBuilderTest {
 
 		String expected = "UPDATE employees SET is_active = ?";
 		List<Object> expectedValues = List.of(isActive);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -102,7 +102,7 @@ public class SqlQueryBuilderTest {
 
 		String expected = "DELETE FROM employees WHERE id = ?";
 		List<Object> expectedValues = List.of(id);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 
@@ -125,7 +125,7 @@ public class SqlQueryBuilderTest {
 
 		String expected = "INSERT INTO employees (id, name, age, is_active) VALUES (?, ?, ?, ?)";
 		List<Object> expectedValues = List.of(id, name, age, isActive);
-		assertEquals(expected, query.toString());
+		assertEquals(expected, query.getSql());
 		assertEquals(expectedValues, query.getValues());
 	}
 

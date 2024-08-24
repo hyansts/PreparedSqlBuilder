@@ -174,6 +174,7 @@ public class SqlSubqueryBuilderTest {
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 
+		// Default alias = aggregator_fieldName (max_age)
 		DbAggregateField<Integer> maxAge = emp.age.max();
 
 		query.select(subquery.getField(emp.department_id).as("dep_id"), subquery.getField(maxAge), dep.title.as("title"))
@@ -184,7 +185,7 @@ public class SqlSubqueryBuilderTest {
 
 		String expectedSQL = "SELECT sub.id AS dep_id, sub.max_age, dep.title AS title " +
 									 "FROM ("
-									 + "SELECT emp.department_id AS id, MAX(emp.age) "
+									 + "SELECT emp.department_id AS id, MAX(emp.age) AS max_age "
 									 + "FROM employees AS emp "
 									 + "GROUP BY emp.department_id) AS sub " +
 									 "INNER JOIN department AS dep " +
@@ -272,6 +273,39 @@ public class SqlSubqueryBuilderTest {
 								.from(emp3)
 								.limit(10)
 								.offset(90));
+
+		String expectedSQL = "(SELECT id FROM employees LIMIT 10 OFFSET 10 " +
+									 "UNION " +
+									 "SELECT id FROM employees LIMIT 10 OFFSET 50 " +
+									 "UNION " +
+									 "SELECT id FROM employees LIMIT 10 OFFSET 90)";
+
+		assertEquals(expectedSQL, subquery.getSql());
+	}
+
+	@Test
+	public void testCombiningNestedSubqueries() {
+
+		EmployeesDbTable emp = new EmployeesDbTable();
+		EmployeesDbTable emp2 = new EmployeesDbTable();
+		EmployeesDbTable emp3 = new EmployeesDbTable();
+
+		SqlSubquery subquery = SqlQueryFactory.createSubquery();
+		SqlSubquery subquery2 = SqlQueryFactory.createSubquery();
+		SqlSubquery subquery3 = SqlQueryFactory.createSubquery();
+
+		subquery.select(emp.id)
+				.from(emp)
+				.limit(10)
+				.offset(10)
+				.union(subquery2.select(emp2.id)
+								.from(emp2)
+								.limit(10)
+								.offset(50)
+								.union(subquery3.select(emp3.id)
+												.from(emp3)
+												.limit(10)
+												.offset(90)));
 
 		String expectedSQL = "(SELECT id FROM employees LIMIT 10 OFFSET 10 " +
 									 "UNION " +
