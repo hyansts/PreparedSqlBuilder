@@ -1,7 +1,5 @@
 package com.github.hyansts.preparedsqlbuilder.query.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -214,14 +212,6 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		this.values.addAll(query.getValues());
 		this.sql.append(EXCEPT_ALL).append(query);
 		return this;
-	}
-
-	//TODO: create a better way to interface with PreparedStatement
-	public void prepareValues(PreparedStatement preparedStatement) throws SQLException {
-		int i = 1;
-		for (var value : this.values) {
-			preparedStatement.setObject(i++, value);
-		}
 	}
 
 	@Override

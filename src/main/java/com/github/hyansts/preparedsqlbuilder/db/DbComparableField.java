@@ -7,7 +7,6 @@ import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlConditionOperator.*;
 
-//TODO test all of these
 public interface DbComparableField<T> extends DbSortableField {
 
 	default SqlCondition eq(DbComparableField<T> tf) {

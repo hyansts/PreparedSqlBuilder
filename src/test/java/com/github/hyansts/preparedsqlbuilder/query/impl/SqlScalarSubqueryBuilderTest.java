@@ -18,7 +18,6 @@ public class SqlScalarSubqueryBuilderTest {
 
 		public final DbTableField<Integer> id = new DbTableField<>("id", this);
 		public final DbTableField<Integer> age = new DbTableField<>("age", this);
-		public final DbTableField<Integer> department_id = new DbTableField<>("department_id", this);
 
 		public EmployeesDbTable() { super("employees"); }
 	}
