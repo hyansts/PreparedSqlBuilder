@@ -3,7 +3,7 @@
 Prepared SQL Builder is a Java library for building SQL queries. It is a type-safe alternative to concatenating SQL
 strings with user input and provides a fluent API allowing for IDE auto-completion and type checking.
 
-![gif using the api](TODO add gif using the api)
+![psb_example](https://github.com/user-attachments/assets/f9afdd09-71ea-43ea-a30f-45b6a5b0693f)
 
 ## Usage
 
@@ -52,7 +52,7 @@ private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
   defined in the constructor.
 - To model your columns, you can use the `DbTableField` class. The fields need a name and a table of origin to be
   instantiated. The fields also have a generic type, this is the Java representation of the column type, this is not the
-  same as your SQL database type, but rather the type the data will be converted to when column is fetched.
+  same as your SQL database type, but rather the type the data will be converted to when the column is fetched.
 
 There are a number of built-in features like conditional operators, aggregate functions, aliases and more. For more
 detailed information, please refer to the [Documentation](TODO documentation).
