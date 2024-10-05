@@ -7,6 +7,12 @@ import java.util.List;
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 
+/**
+ * Represents a condition in an SQL query. Conditions can be used in SQL clauses.
+ * <p>
+ * Conditions can be combined with the logical operators AND and OR using the {@link #and(SqlCondition)} and
+ * {@link #or(SqlCondition)} methods. Parentheses layers are automatically added when nested conditions are used.
+ */
 public class SqlCondition {
 
 	private final List<Object> comparedValues = new ArrayList<>();
@@ -65,12 +71,34 @@ public class SqlCondition {
 		this.sql = tf1.getFullQualification() + op + valueString;
 	}
 
+	/**
+	 * Add another condition to the current condition using the AND operator.
+	 * <p>
+	 * If the added condition contains nested conditions, they will be wrapped in parentheses keep the logical order of
+	 * operations.
+	 * <p>
+	 * The compared values of the other condition will be added to the current list of compared values.
+	 *
+	 * @param sqlCondition the condition to add to the current one
+	 * @return this instance
+	 */
 	public SqlCondition and(SqlCondition sqlCondition) {
 		this.comparedValues.addAll(sqlCondition.getComparedValues());
 		this.sql += SqlConditionOperator.AND + evaluateParenthesisLayer(sqlCondition);
 		return this;
 	}
 
+	/**
+	 * Add another condition to the current condition using the OR operator.
+	 * <p>
+	 * If the added condition contains nested conditions, they will be wrapped in parentheses keep the logical order of
+	 * operations.
+	 * <p>
+	 * The compared values of the other condition will be added to the current list of compared values.
+	 *
+	 * @param sqlCondition the condition to add to the current one
+	 * @return this instance
+	 */
 	public SqlCondition or(SqlCondition sqlCondition) {
 		this.comparedValues.addAll(sqlCondition.getComparedValues());
 		this.sql += SqlConditionOperator.OR + evaluateParenthesisLayer(sqlCondition);
