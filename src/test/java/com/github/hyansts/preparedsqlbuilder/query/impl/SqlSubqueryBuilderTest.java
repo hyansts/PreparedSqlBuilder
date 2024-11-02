@@ -45,6 +45,8 @@ public class SqlSubqueryBuilderTest {
 		final int departmentId = 10;
 		final String title = "A%";
 		final int adminId = 1000;
+		final int limit = 10;
+		final int offset = 3;
 
 		SqlQuery query = SqlQueryFactory.createQuery();
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
@@ -67,8 +69,8 @@ public class SqlSubqueryBuilderTest {
 			 .on(subquery.getField(subEmp.department_id).eq(dep.id))
 			 .where(dep.admin_id.ge(adminId))
 			 .orderBy(emp_count.desc())
-			 .limit(10)
-			 .offset(3);
+			 .limit(limit)
+			 .offset(offset);
 
 		String expectedSQL = "SELECT emp.id_count, dep.title, dep.admin_id AS dep_admin " +
 									 "FROM ("
@@ -83,10 +85,10 @@ public class SqlSubqueryBuilderTest {
 									 "ON emp.department_id = dep.id " +
 									 "WHERE dep.admin_id >= ? " +
 									 "ORDER BY emp.id_count DESC " +
-									 "LIMIT 10 OFFSET 3";
+									 "LIMIT ? OFFSET ?";
 
 		assertEquals(expectedSQL, query.getSql());
-		assertEquals(List.of(departmentId, title, adminId), query.getValues());
+		assertEquals(List.of(departmentId, title, adminId, limit, offset), query.getValues());
 	}
 
 	@Test
@@ -229,25 +231,30 @@ public class SqlSubqueryBuilderTest {
 		EmployeesDbTable emp = new EmployeesDbTable();
 		EmployeesDbTable emp2 = new EmployeesDbTable();
 
+		final int limit = 10;
+		final int offset1 = 10;
+		final int offset2 = 90;
+
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 		SqlSubquery subquery2 = SqlQueryFactory.createSubquery();
 
 		subquery.select(emp.id)
 				.from(emp)
 				.orderBy(emp.id.desc())
-				.limit(10)
-				.offset(10)
+				.limit(limit)
+				.offset(offset1)
 				.union(subquery2.select(emp2.id)
 								.from(emp2)
 								.orderBy(emp2.id.desc())
-								.limit(10)
-								.offset(90));
+								.limit(limit)
+								.offset(offset2));
 
-		String expectedSQL = "(SELECT id FROM employees ORDER BY id DESC LIMIT 10 OFFSET 10 " +
+		String expectedSQL = "(SELECT id FROM employees ORDER BY id DESC LIMIT ? OFFSET ? " +
 									 "UNION " +
-									 "SELECT id FROM employees ORDER BY id DESC LIMIT 10 OFFSET 90)";
-
+									 "SELECT id FROM employees ORDER BY id DESC LIMIT ? OFFSET ?)";
+		List<Object> expectedParams = List.of(limit, offset1, limit, offset2);
 		assertEquals(expectedSQL, subquery.getSql());
+		assertEquals(expectedParams, subquery.getValues());
 	}
 
 	@Test
@@ -261,26 +268,32 @@ public class SqlSubqueryBuilderTest {
 		SqlSubquery subquery2 = SqlQueryFactory.createSubquery();
 		SqlSubquery subquery3 = SqlQueryFactory.createSubquery();
 
+		final int limit = 10;
+		final int offset1 = 10;
+		final int offset2 = 50;
+		final int offset3 = 90;
+
 		subquery.select(emp.id)
 				.from(emp)
-				.limit(10)
-				.offset(10)
+				.limit(limit)
+				.offset(offset1)
 				.union(subquery2.select(emp2.id)
 								.from(emp2)
-								.limit(10)
-								.offset(50))
+								.limit(limit)
+								.offset(offset2))
 				.union(subquery3.select(emp3.id)
 								.from(emp3)
-								.limit(10)
-								.offset(90));
+								.limit(limit)
+								.offset(offset3));
 
-		String expectedSQL = "(SELECT id FROM employees LIMIT 10 OFFSET 10 " +
+		String expectedSQL = "(SELECT id FROM employees LIMIT ? OFFSET ? " +
 									 "UNION " +
-									 "SELECT id FROM employees LIMIT 10 OFFSET 50 " +
+									 "SELECT id FROM employees LIMIT ? OFFSET ? " +
 									 "UNION " +
-									 "SELECT id FROM employees LIMIT 10 OFFSET 90)";
-
+									 "SELECT id FROM employees LIMIT ? OFFSET ?)";
+		List<Object> expectedValues = List.of(limit, offset1, limit, offset2, limit, offset3);
 		assertEquals(expectedSQL, subquery.getSql());
+		assertEquals(expectedValues, subquery.getValues());
 	}
 
 	@Test
@@ -290,30 +303,36 @@ public class SqlSubqueryBuilderTest {
 		EmployeesDbTable emp2 = new EmployeesDbTable();
 		EmployeesDbTable emp3 = new EmployeesDbTable();
 
+		final int limit = 10;
+		final int offset1 = 10;
+		final int offset2 = 50;
+		final int offset3 = 90;
+
 		SqlSubquery subquery = SqlQueryFactory.createSubquery();
 		SqlSubquery subquery2 = SqlQueryFactory.createSubquery();
 		SqlSubquery subquery3 = SqlQueryFactory.createSubquery();
 
 		subquery.select(emp.id)
 				.from(emp)
-				.limit(10)
-				.offset(10)
+				.limit(limit)
+				.offset(offset1)
 				.union(subquery2.select(emp2.id)
 								.from(emp2)
-								.limit(10)
-								.offset(50)
+								.limit(limit)
+								.offset(offset2)
 								.union(subquery3.select(emp3.id)
 												.from(emp3)
-												.limit(10)
-												.offset(90)));
+												.limit(limit)
+												.offset(offset3)));
 
-		String expectedSQL = "(SELECT id FROM employees LIMIT 10 OFFSET 10 " +
+		String expectedSQL = "(SELECT id FROM employees LIMIT ? OFFSET ? " +
 									 "UNION " +
-									 "SELECT id FROM employees LIMIT 10 OFFSET 50 " +
+									 "SELECT id FROM employees LIMIT ? OFFSET ? " +
 									 "UNION " +
-									 "SELECT id FROM employees LIMIT 10 OFFSET 90)";
-
+									 "SELECT id FROM employees LIMIT ? OFFSET ?)";
+		List<Object> expectedValues = List.of(limit, offset1, limit, offset2, limit, offset3);
 		assertEquals(expectedSQL, subquery.getSql());
+		assertEquals(expectedValues, subquery.getValues());
 	}
 
 }

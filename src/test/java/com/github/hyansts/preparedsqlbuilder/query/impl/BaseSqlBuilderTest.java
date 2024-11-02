@@ -352,13 +352,17 @@ public class BaseSqlBuilderTest {
 
 		EmployeesDbTable tb = new EmployeesDbTable();
 
+		final int limit = 1;
+
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select()
 			 .from(tb)
-			 .limit(1);
+			 .limit(limit);
 
-		String expected = "SELECT * FROM employees LIMIT 1";
+		String expected = "SELECT * FROM employees LIMIT ?";
+		List<Object> expectedValues = List.of(limit);
 		assertEquals(expected, query.getSql());
+		assertEquals(expectedValues, query.getValues());
 	}
 
 	@Test
@@ -366,14 +370,19 @@ public class BaseSqlBuilderTest {
 
 		EmployeesDbTable tb = new EmployeesDbTable();
 
+		final int limit = 1;
+		final int offset = 10;
+
 		SqlQuery query = SqlQueryFactory.createQuery();
 		query.select()
 			 .from(tb)
-			 .limit(1)
-			 .offset(10);
+			 .limit(limit)
+			 .offset(offset);
 
-		String expected = "SELECT * FROM employees LIMIT 1 OFFSET 10";
+		String expected = "SELECT * FROM employees LIMIT ? OFFSET ?";
+		List<Object> expectedValues = List.of(limit, offset);
 		assertEquals(expected, query.getSql());
+		assertEquals(expectedValues, query.getValues());
 	}
 
 	@Test
@@ -494,6 +503,8 @@ public class BaseSqlBuilderTest {
 		final int age = 30;
 		final String title = "A%";
 		final int departmentId = 10;
+		final int limit = 10;
+		final int offset = 3;
 
 		DbAggregateField<Long> emp_count = emp.id.count();
 
@@ -504,8 +515,8 @@ public class BaseSqlBuilderTest {
 			 .where(emp.is_active.eq(isActive).and(emp.age.gt(age).or(dep.admin_id.eq(emp.id))))
 			 .groupBy(dep.title)
 			 .having(dep.title.like(title))
-			 .limit(10)
-			 .offset(3)
+			 .limit(limit)
+			 .offset(offset)
 			 .union(unionQuery.select(uemp.id.max().as("max_id"), udep.title.as("dep_name"))
 							  .from(uemp.as("uemp"))
 							  .innerJoin(udep.as("udep"))
@@ -520,7 +531,7 @@ public class BaseSqlBuilderTest {
 									 "ON emp.department_id = dep.id " +
 									 "WHERE emp.is_active = ? AND (emp.age > ? OR dep.admin_id = emp.id) " +
 									 "GROUP BY dep.title HAVING dep.title LIKE ? " +
-									 "LIMIT 10 OFFSET 3 " +
+									 "LIMIT ? OFFSET ? " +
 									 "UNION " +
 									 "SELECT MAX(uemp.id) AS max_id, udep.title AS dep_name " +
 									 "FROM employees AS uemp " +
@@ -531,7 +542,7 @@ public class BaseSqlBuilderTest {
 									 "ORDER BY emp_count DESC";
 
 		assertEquals(expectedSQL, query.getSql());
-		assertEquals(List.of(isActive, age, title, departmentId), query.getValues());
+		assertEquals(List.of(isActive, age, title, limit, offset, departmentId), query.getValues());
 	}
 
 }

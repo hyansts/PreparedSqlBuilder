@@ -401,7 +401,7 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	 * Adds a HAVING clause to the SQL query.
 	 * <p>
 	 * The passed condition is appended to the current SQL query. Conditions are normally created by comparing fields
-	 * with values or with each other.
+	 * with values or with each other. The condition's values are added to the prepared statement's values list.
 	 * <p>
 	 * <pre>
 	 * Example:
@@ -409,7 +409,9 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	 * </pre>
 	 * <p>
 	 * Expected SQL:
-	 * {@code "GROUP BY id HAVING MIN(age) > 18"}
+	 * {@code "GROUP BY id HAVING MIN(age) > ?"}
+	 * <p>
+	 * Expected values list: {@code [18]}
 	 *
 	 * @param condition the condition to be added to the HAVING clause.
 	 * @return the current implementation of {@link HavingStep}.
@@ -446,36 +448,44 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	/**
 	 * Adds a LIMIT clause to the SQL query.
 	 * <p>
-	 * The passed limit is appended to the current SQL query.
+	 * The passed limit is appended to the current SQL query. The limit's value is added to the prepared statement's
+	 * values list.
 	 * <p>
 	 * Example: {@code limit(1)}
 	 * <p>
-	 * Expected SQL: {@code "LIMIT 1"}
+	 * Expected SQL: {@code "LIMIT ?"}
+	 * <p>
+	 * Expected values list: {@code [1]}
 	 *
 	 * @param number the limit to be added to the LIMIT clause.
 	 * @return the current implementation of {@link LimitStep}.
 	 */
 	@Override
 	public LimitStep<T> limit(Integer number) {
-		this.sql.append(LIMIT).append(number);
+		this.values.add(number);
+		this.sql.append(LIMIT).append('?');
 		return this;
 	}
 
 	/**
 	 * Adds an OFFSET clause to the SQL query.
 	 * <p>
-	 * The passed offset is appended to the current SQL query.
+	 * The passed offset is appended to the current SQL query. The offset's value is added to the prepared statement's
+	 * values list.
 	 * <p>
 	 * Example: {@code limit(1).offset(3)}
 	 * <p>
-	 * Expected SQL: {@code "LIMIT 1 OFFSET 3"}
+	 * Expected SQL: {@code "LIMIT ? OFFSET ?"}
+	 * <p>
+	 * Expected prepared statement parameter list: {@code [1, 3]}
 	 *
 	 * @param number the offset to be added to the OFFSET clause.
 	 * @return the current implementation of {@link CombiningOperation}.
 	 */
 	@Override
 	public CombiningOperation<T> offset(Integer number) {
-		this.sql.append(OFFSET).append(number);
+		this.values.add(number);
+		this.sql.append(OFFSET).append('?');
 		return this;
 	}
 
@@ -569,9 +579,23 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		return this;
 	}
 
+	/**
+	 * Gets the list of values for the prepared statement.
+	 * <p>
+	 * The values are kept in the same order as they appeared in the SQL query.
+	 *
+	 * @return the list of values.
+	 */
 	@Override
 	public List<Object> getValues() { return values; }
 
+	/**
+	 * Gets the final SQL query string.
+	 * <p>
+	 * Before returning the final SQL query string, it is validated to check for any undefined fields in the query.
+	 *
+	 * @return the final SQL query string.
+	 */
 	@Override
 	public String getSql() {
 		processFieldDefinition(null);
@@ -579,6 +603,14 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 		return this.sql.toString();
 	}
 
+	/**
+	 * Converts the query to a string representation.
+	 * <p>
+	 * To get the final SQL query string, use the {@link #getSql()} method instead.
+	 * This method does not validate undefined fields in the query and returns the SQL string as-is.
+	 *
+	 * @return the string representation of the query.
+	 */
 	@Override
 	public String toString() {
 		processFieldDefinition(null);
