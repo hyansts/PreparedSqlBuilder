@@ -36,7 +36,7 @@ SqlScalarSubquery<T> scalarSubquery = SqlQueryFactory.createScalarSubquery();
 ```
 
 - To build a query, you'll first need to have a model for your table(s) and columns. The API provides a way to create
-those classes, here's an example:
+  those classes, here's an example:
 
 ```java 
 private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
@@ -61,15 +61,47 @@ There are a number of built-in features like conditional operators, aggregate fu
 
 ## Installation
 
-- You can add the library as a dependency using Maven:
+- You can add the library as a dependency using JitPack:
+
+### Maven
+
+```xml
+<repositories>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
+</repositories>
+```
 
 ```xml
 <dependency>
-    <groupId>__GROUP_ID__</groupId>
-    <artifactId>__ARTIFACT_ID__</artifactId>
-    <version>__VERSION__</version>
+	<groupId>com.github.hyansts</groupId>
+	<artifactId>PreparedSqlBuilder</artifactId>
+	<version>v1.0.0</version>
 </dependency>
 ```
 
+### Gradle
+
+```groovy
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+```groovy
+dependencies {
+    implementation 'com.github.hyansts:PreparedSqlBuilder:v1.0.0'
+}
+```
+
+Check out the [JitPack PreparedSqlBuilder](https://jitpack.io/#hyansts/PreparedSqlBuilder) page for more information.
+
 ## License
+
 This project is licensed under the [Apache 2.0 License](LICENSE).
