@@ -4,9 +4,32 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.hyansts.preparedsqlbuilder</groupId>
+	<groupId>com.github.hyansts</groupId>
 	<artifactId>PreparedSqlBuilder</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
+
+	<name>Prepared SQL Builder</name>
+	<description>
+		Prepared SQL Builder is a Java library for building SQL queries. It is a type-safe alternative to concatenating SQL
+		strings with user input and provides a fluent API allowing for IDE auto-completion and type checking.
+	</description>
+	<url>https://github.com/hyansts/PreparedSqlBuilder</url>
+
+	<licenses>
+		<license>
+			<name>Apache 2.0 License</name>
+			<url>https://opensource.org/license/apache-2-0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>hyansts</id>
+			<name>Hyan Santos</name>
+			<url>https://github.com/hyansts</url>
+		</developer>
+	</developers>
 
 	<properties>
 		<java.version>21</java.version>

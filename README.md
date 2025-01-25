@@ -27,9 +27,12 @@ void example() {
 - You can start building your query using the `SqlQueryFactory` class. It can create three different types of queries:
 
 ```java
-SqlQuery query = SqlQueryFactory.createQuery(); // A common SQL query
-SqlSubquery subquery = SqlQueryFactory.createSubquery(); // A SQL subquery to be used as a derived table or as part of a query
-SqlScalarSubquery<T> scalarSubquery = SqlQueryFactory.createScalarSubquery(); // A scalar subquery that returns a single value of a user defined type
+// A common SQL query
+SqlQuery query = SqlQueryFactory.createQuery();
+// A SQL subquery to be used as a derived table or as part of a query
+SqlSubquery subquery = SqlQueryFactory.createSubquery();
+// A scalar subquery that returns a single value of a user defined type
+SqlScalarSubquery<T> scalarSubquery = SqlQueryFactory.createScalarSubquery();
 ```
 
 - To build a query, you'll first need to have a model for your table(s) and columns. The API provides a way to create
@@ -54,8 +57,7 @@ private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
   instantiated. The fields also have a generic type, this is the Java representation of the column type, this is not the
   same as your SQL database type, but rather the type the data will be converted to when the column is fetched.
 
-There are a number of built-in features like conditional operators, aggregate functions, aliases and more. For more
-detailed information, please refer to the [Documentation](TODO documentation).
+There are a number of built-in features like conditional operators, aggregate functions, aliases and more.
 
 ## Installation
 
@@ -70,4 +72,4 @@ detailed information, please refer to the [Documentation](TODO documentation).
 ```
 
 ## License
-TODO: define the License
+This project is licensed under the [Apache 2.0 License](LICENSE).
