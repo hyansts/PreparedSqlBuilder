@@ -19,7 +19,7 @@ public class StringHolder {
 
 	public StringHolder(String string) { this.value = string; }
 
-	public boolean isBlank() { return this.value == null || this.value.isEmpty(); }
+	public boolean isBlank() { return this.value == null || this.value.isBlank(); }
 	public String getValue() { return this.value; }
 	public void setValue(String value) { this.value = value; }
 	public StringHolder getDefaultHolder() { return defaultHolder; }

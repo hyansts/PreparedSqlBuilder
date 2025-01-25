@@ -3,6 +3,7 @@ package com.github.hyansts.preparedsqlbuilder.query.impl;
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.query.SqlSubquery;
+import com.github.hyansts.preparedsqlbuilder.util.StringUtil;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
@@ -17,7 +18,7 @@ class SqlSubqueryBuilder extends BaseSqlBuilder<SqlSubquery> implements SqlSubqu
 
 	@Override
 	public String getDefinition() {
-		if (this.alias == null || this.alias.isBlank()) {
+		if (StringUtil.isBlank(this.alias)) {
 			throw new IllegalStateException("Derived table subquery must have an alias: " + this.getSql());
 		}
 		return this.getSql() + AS + this.alias;

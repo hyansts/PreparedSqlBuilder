@@ -8,6 +8,7 @@ import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 import com.github.hyansts.preparedsqlbuilder.util.StringHolder;
+import com.github.hyansts.preparedsqlbuilder.util.StringUtil;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
@@ -28,7 +29,7 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 
 	@Override
 	public String getFullQualification() {
-		return this.tableLike == null || this.tableLike.getAlias() == null || tableLike.getAlias().isBlank()
+		return this.tableLike == null || StringUtil.isBlank(this.tableLike.getAlias())
 					   ? this.getSql() : this.tableLike.getAlias() + "." + this.getLabel();
 	}
 

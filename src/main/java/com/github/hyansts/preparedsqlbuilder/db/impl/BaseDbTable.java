@@ -1,6 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder.db.impl;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbTable;
+import com.github.hyansts.preparedsqlbuilder.util.StringUtil;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
@@ -15,11 +16,10 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
  * <p>
  * The table name is specified in the constructor. In addition to that, a table prefix can also be specified. A table
  * prefix is most commonly used to specify the database name or the schema name. When the prefix is specified, the table
- * name is formatted as "table_prefix.table_name". The table name and prefix are used to reference the table in the SQL
- * statement.
+ * name is formatted as "table_prefix.table_name" to reference the table in the SQL statement.
  * <p>
- * The table alias is a parameter that can be specified using the {@link #as(String)} method. The table alias is used to
- * reference the table in the SQL statement.
+ * A table alias can be specified using the {@link #as(String)} method. The table alias is used to reference the table
+ * in the SQL statement.
  */
 public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 
@@ -44,25 +44,40 @@ public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 		return (T) this;
 	}
 
+	/**
+	 * @return the Table name as defined in the constructor. Does not include the table prefix.
+	 */
 	@Override
 	public String getTableName() { return this.tableName; }
 
+	/**
+	 * @return table alias as defined using the {@link #as(String)} method.
+	 */
 	@Override
 	public String getAlias() { return this.tableAlias; }
 
+	/**
+	 * @return the table prefix as defined in the constructor. Usually, this is the database name or the schema name.
+	 */
 	@Override
 	public String getTablePrefix() { return this.tablePrefix; }
 
+	/**
+	 * @return the table definition as: {@code "table_prefix.table_name AS table_alias"}. If no alias is defined, simply
+	 * returns the full table name.
+	 */
 	@Override
 	public String getDefinition() {
-		return this.tableAlias == null || this.tableAlias.isBlank()
-					   ? getFullTableName() : getFullTableName() + AS + this.tableAlias;
+		return StringUtil.isBlank(this.tableAlias) ? getFullTableName() : getFullTableName() + AS + this.tableAlias;
 	}
 
+	/**
+	 * @return the full table name, which is the result of combining the table prefix with the table name:
+	 * {@code "table_prefix.table_name"}. If no table prefix is defined, simply returns the table name.
+	 */
 	@Override
 	public String getFullTableName() {
-		return this.tablePrefix == null || this.tablePrefix.isBlank()
-					   ? this.tableName : this.tablePrefix + "." + this.tableName;
+		return StringUtil.isBlank(this.tablePrefix) ? this.tableName : this.tablePrefix + "." + this.tableName;
 	}
 
 }

@@ -10,6 +10,7 @@ import com.github.hyansts.preparedsqlbuilder.db.DbWritableField;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlAggregator;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 import com.github.hyansts.preparedsqlbuilder.util.StringHolder;
+import com.github.hyansts.preparedsqlbuilder.util.StringUtil;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 
@@ -114,7 +115,7 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	@Override
 	public String getFullQualification() {
 		String fieldName = this.fieldName.getValueOrDefault();
-		return this.table == null || this.table.getAlias() == null || this.table.getAlias().isBlank()
+		return this.table == null || StringUtil.isBlank(this.table.getAlias())
 					   ? fieldName : this.table.getAlias() + "." + fieldName;
 	}
 
