@@ -21,7 +21,7 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
  * A table alias can be specified using the {@link #as(String)} method. The table alias is used to reference the table
  * in the SQL statement.
  */
-public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
+public abstract class BaseDbTable implements DbTable {
 
 	private final String tableName;
 	private final String tablePrefix;
@@ -38,10 +38,9 @@ public abstract class BaseDbTable<T extends BaseDbTable<T>> implements DbTable {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public T as(String alias) {
+	public DbTable as(String alias) {
 		this.tableAlias = alias;
-		return (T) this;
+		return this;
 	}
 
 	/**

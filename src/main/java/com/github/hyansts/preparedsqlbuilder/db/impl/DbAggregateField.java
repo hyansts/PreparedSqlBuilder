@@ -23,12 +23,14 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
 public class DbAggregateField<T> implements DbComparableField<T> {
 
 	private final SqlAggregator aggregator;
-	private final DbField field;
+	private final DbField<?> field;
 	private final StringHolder alias = new StringHolder();
+	private final Class<T> type;
 
-	public DbAggregateField(SqlAggregator aggregator, DbField field) {
+	public DbAggregateField(SqlAggregator aggregator, DbField<?> field, Class<T> type) {
 		this.aggregator = aggregator;
 		this.field = field;
+		this.type = type;
 		this.alias.setValue((aggregator + "_" + field.getFieldName()).toLowerCase());
 	}
 
@@ -112,7 +114,7 @@ public class DbAggregateField<T> implements DbComparableField<T> {
 	 */
 	@Override
 	public DbComparableField<T> mapTo(DbTableLike tableLike) {
-		return new DbTableField<>(this.alias, tableLike);
+		return new DbTableField<>(this.alias, tableLike, this.type);
 	}
 
 }

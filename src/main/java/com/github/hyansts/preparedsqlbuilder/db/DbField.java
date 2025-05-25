@@ -1,5 +1,7 @@
 package com.github.hyansts.preparedsqlbuilder.db;
 
-public interface DbField extends DbFieldLike {
+public interface DbField<T> extends DbFieldLike {
 	String getFieldName();
+
+	Class<T> getType();
 }

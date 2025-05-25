@@ -12,7 +12,7 @@ public interface SelectStatement<T> extends CombinableQuery<T> {
 
 	SelectStep<T> selectDistinct(String expression, DbFieldLike... fields);
 
-	SelectStep<T> selectCount(DbField field);
+	SelectStep<T> selectCount(DbField<?> field);
 
 	SelectStep<T> selectCount();
 }

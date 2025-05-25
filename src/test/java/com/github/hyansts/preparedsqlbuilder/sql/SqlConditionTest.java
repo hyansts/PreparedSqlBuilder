@@ -12,9 +12,9 @@ public class SqlConditionTest {
 
 	@Test
 	public void testAndField() {
-		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
-		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
-		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
+		DbTableField<Integer> field1 = new DbTableField<>("field1", null, Integer.class);
+		DbTableField<Integer> field2 = new DbTableField<>("field2", null, Integer.class);
+		DbTableField<Integer> field3 = new DbTableField<>("field3", null, Integer.class);
 
 		SqlCondition condition1 = new SqlCondition(field1, SqlConditionOperator.EQ, field2);
 		SqlCondition condition2 = new SqlCondition(field1, SqlConditionOperator.EQ, field3);
@@ -27,9 +27,9 @@ public class SqlConditionTest {
 
 	@Test
 	public void testOrField() {
-		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
-		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
-		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
+		DbTableField<Integer> field1 = new DbTableField<>("field1", null, Integer.class);
+		DbTableField<Integer> field2 = new DbTableField<>("field2", null, Integer.class);
+		DbTableField<Integer> field3 = new DbTableField<>("field3", null, Integer.class);
 
 		SqlCondition condition1 = new SqlCondition(field1, SqlConditionOperator.EQ, field2);
 		SqlCondition condition2 = new SqlCondition(field1, SqlConditionOperator.EQ, field3);
@@ -42,10 +42,10 @@ public class SqlConditionTest {
 
 	@Test
 	public void testAndNested() {
-		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
-		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
-		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
-		DbTableField<Integer> field4 = new DbTableField<>("field4", null);
+		DbTableField<Integer> field1 = new DbTableField<>("field1", null, Integer.class);
+		DbTableField<Integer> field2 = new DbTableField<>("field2", null, Integer.class);
+		DbTableField<Integer> field3 = new DbTableField<>("field3", null, Integer.class);
+		DbTableField<Integer> field4 = new DbTableField<>("field4", null, Integer.class);
 
 		SqlCondition condition1 = new SqlCondition(field1, SqlConditionOperator.EQ, 1);
 		SqlCondition condition2 = new SqlCondition(field2, SqlConditionOperator.EQ, 2);
@@ -62,10 +62,10 @@ public class SqlConditionTest {
 
 	@Test
 	public void testOrNested() {
-		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
-		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
-		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
-		DbTableField<Integer> field4 = new DbTableField<>("field4", null);
+		DbTableField<Integer> field1 = new DbTableField<>("field1", null, Integer.class);
+		DbTableField<Integer> field2 = new DbTableField<>("field2", null, Integer.class);
+		DbTableField<Integer> field3 = new DbTableField<>("field3", null, Integer.class);
+		DbTableField<Integer> field4 = new DbTableField<>("field4", null, Integer.class);
 
 		SqlCondition condition1 = new SqlCondition(field1, SqlConditionOperator.EQ, 1);
 		SqlCondition condition2 = new SqlCondition(field2, SqlConditionOperator.EQ, 2);
@@ -82,10 +82,10 @@ public class SqlConditionTest {
 
 	@Test
 	public void testAndOR() {
-		DbTableField<Integer> field1 = new DbTableField<>("field1", null);
-		DbTableField<Integer> field2 = new DbTableField<>("field2", null);
-		DbTableField<Integer> field3 = new DbTableField<>("field3", null);
-		DbTableField<Integer> field4 = new DbTableField<>("field4", null);
+		DbTableField<Integer> field1 = new DbTableField<>("field1", null, Integer.class);
+		DbTableField<Integer> field2 = new DbTableField<>("field2", null, Integer.class);
+		DbTableField<Integer> field3 = new DbTableField<>("field3", null, Integer.class);
+		DbTableField<Integer> field4 = new DbTableField<>("field4", null, Integer.class);
 
 		SqlCondition condition1 = new SqlCondition(field1, SqlConditionOperator.EQ, 1);
 		SqlCondition condition2 = new SqlCondition(field2, SqlConditionOperator.EQ, 2);

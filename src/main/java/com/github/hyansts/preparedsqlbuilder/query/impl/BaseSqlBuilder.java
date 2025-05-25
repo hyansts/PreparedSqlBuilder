@@ -175,7 +175,7 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	 * @return the current implementation of {@link SelectStep}.
 	 */
 	@Override
-	public SelectStep<T> selectCount(DbField field) {
+	public SelectStep<T> selectCount(DbField<?> field) {
 		this.sql.append(SELECT).append(SqlAggregator.COUNT.applyTo(field.getFullQualification()));
 		return this;
 	}
@@ -388,7 +388,7 @@ abstract class BaseSqlBuilder<T> implements SelectStatement<T>, SelectQuerySteps
 	 * @return the current implementation of {@link GroupByStep}.
 	 */
 	@Override
-	public GroupByStep<T> groupBy(DbField... fields) {
+	public GroupByStep<T> groupBy(DbField<?>... fields) {
 		StringJoiner joinedFields = new StringJoiner(", ");
 		for (var field : fields) {
 			joinedFields.add(field.getFullQualification());

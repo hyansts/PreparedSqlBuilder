@@ -24,55 +24,58 @@ import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
  * Fields also have a generic type, this is the Java representation of the column type, this is not the same as your SQL
  * database type, but rather the type the data will be converted to when the column is fetched.
  */
-public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparableField<T> {
+public class DbTableField<T> implements DbField<T>, DbWritableField<T>, DbComparableField<T> {
 
 	private final StringHolder fieldName;
 	private final StringHolder alias = new StringHolder();
 	private final DbTableLike table;
+	private final Class<T> type;
 
-	public DbTableField(String name, DbTableLike table) {
+	public DbTableField(String name, DbTableLike table, Class<T> type) {
 		this.fieldName = new StringHolder(name);
 		this.table = table;
+		this.type = type;
 	}
 
-	DbTableField(StringHolder name, DbTableLike table) {
+	DbTableField(StringHolder name, DbTableLike table, Class<T> type) {
 		this.fieldName = name;
 		this.table = table;
+		this.type = type;
 	}
 
 	/**
 	 * @return a new aggregate field with the MAX aggregation function applied to this field.
 	 */
 	public DbAggregateField<T> max() {
-		return new DbAggregateField<>(SqlAggregator.MAX, this);
+		return new DbAggregateField<>(SqlAggregator.MAX, this, this.type);
 	}
 
 	/**
 	 * @return a new aggregate field with the MIN aggregation function applied to this field.
 	 */
 	public DbAggregateField<T> min() {
-		return new DbAggregateField<>(SqlAggregator.MIN, this);
+		return new DbAggregateField<>(SqlAggregator.MIN, this, this.type);
 	}
 
 	/**
 	 * @return a new aggregate field with the AVG aggregation function applied to this field.
 	 */
 	public DbAggregateField<Double> avg() {
-		return new DbAggregateField<>(SqlAggregator.AVG, this);
+		return new DbAggregateField<>(SqlAggregator.AVG, this, Double.class);
 	}
 
 	/**
 	 * @return a new aggregate field with the COUNT aggregation function applied to this field.
 	 */
 	public DbAggregateField<Long> count() {
-		return new DbAggregateField<>(SqlAggregator.COUNT, this);
+		return new DbAggregateField<>(SqlAggregator.COUNT, this, Long.class);
 	}
 
 	/**
 	 * @return a new aggregate field with the SUM aggregation function applied to this field.
 	 */
 	public DbAggregateField<Double> sum() {
-		return new DbAggregateField<>(SqlAggregator.SUM, this);
+		return new DbAggregateField<>(SqlAggregator.SUM, this, Double.class);
 	}
 
 	/**
@@ -130,6 +133,8 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	/**
 	 * @return the definition of this field, which is the full qualification associated with the alias. If no alias is
 	 * set, only the full qualification is returned.
+	 * <p>
+	 * e.g.: "table_name.field_name AS alias_name"
 	 */
 	@Override
 	public String getDefinition() {
@@ -147,6 +152,9 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	 */
 	@Override
 	public DbTableLike getTableLike() { return this.table; }
+
+	@Override
+	public Class<T> getType() { return this.type; }
 
 	/**
 	 * Generates a new DbTableField with the same label as this field but defined to the given table.
@@ -166,7 +174,7 @@ public class DbTableField<T> implements DbField, DbWritableField<T>, DbComparabl
 	@Override
 	public DbComparableField<T> mapTo(DbTableLike tableLike) {
 		this.alias.setDefaultHolder(this.fieldName);
-		return new DbTableField<>(this.alias, tableLike);
+		return new DbTableField<>(this.alias, tableLike, this.type);
 	}
 
 	/**

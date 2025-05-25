@@ -14,19 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SqlScalarSubqueryBuilderTest {
 
-	private static class EmployeesDbTable extends BaseDbTable<EmployeesDbTable> {
+	private static class EmployeesDbTable extends BaseDbTable {
 
-		public final DbTableField<Integer> id = new DbTableField<>("id", this);
-		public final DbTableField<Integer> age = new DbTableField<>("age", this);
+		public final DbTableField<Integer> id = new DbTableField<>("id", this, Integer.class);
+		public final DbTableField<Integer> age = new DbTableField<>("age", this, Integer.class);
 
 		public EmployeesDbTable() { super("employees"); }
 	}
 
-	private static class DepartmentDbTable extends BaseDbTable<DepartmentDbTable> {
+	private static class DepartmentDbTable extends BaseDbTable {
 
-		public final DbTableField<Integer> id = new DbTableField<>("id", this);
-		public final DbTableField<String> title = new DbTableField<>("title", this);
-		public final DbTableField<Integer> admin_id = new DbTableField<>("admin_id", this);
+		public final DbTableField<Integer> id = new DbTableField<>("id", this, Integer.class);
+		public final DbTableField<String> title = new DbTableField<>("title", this, String.class);
+		public final DbTableField<Integer> admin_id = new DbTableField<>("admin_id", this, Integer.class);
 
 		public DepartmentDbTable() { super("department"); }
 	}

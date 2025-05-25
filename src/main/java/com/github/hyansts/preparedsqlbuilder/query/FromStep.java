@@ -18,7 +18,7 @@ public interface FromStep<T> extends CombiningOperation<T> {
 
 	FromStep<T> crossJoin(DbTableLike table);
 
-	GroupByStep<T> groupBy(DbField... fields);
+	GroupByStep<T> groupBy(DbField<?>... fields);
 
 	HavingStep<T> having(SqlCondition sqlCondition);
 
