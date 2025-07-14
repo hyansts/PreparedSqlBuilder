@@ -36,20 +36,18 @@ public class MappedDbTableTest {
 			}
 		}
 
+		private Integer id;
+		private Integer field;
+		private Integer field2;
+
 		public Entity(Integer id) {
 			this.id = id;
 		}
-
 		public Entity(Integer id, Integer field, Integer field2) {
 			this.id = id;
 			this.field = field;
 			this.field2 = field2;
 		}
-
-		private Integer id;
-		private Integer field;
-		private Integer field2;
-
 		public Integer getId() { return id; }
 		public void setId(Integer id) { this.id = id; }
 		public Integer getField() { return field; }
@@ -74,6 +72,15 @@ public class MappedDbTableTest {
 		PreparedSql query = mapping.selectAllQuery();
 		assertEquals("SELECT * FROM table", query.getSql());
 		assertEquals(Collections.EMPTY_LIST, query.getValues());
+	}
+
+	@Test
+	public void testSelectQuery() {
+		Entity.Table tb = new Entity.Table();
+		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		PreparedSql query = mapping.selectQuery(q -> q.where(tb.field.eq(2)).limit(1));
+		assertEquals("SELECT * FROM table WHERE field = ? LIMIT ?", query.getSql());
+		assertEquals(List.of(2, 1), query.getValues());
 	}
 
 	@Test

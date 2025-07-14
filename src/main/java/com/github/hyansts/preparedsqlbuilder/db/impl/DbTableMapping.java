@@ -5,7 +5,9 @@ import java.util.function.Function;
 import com.github.hyansts.preparedsqlbuilder.db.DbEntity;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldExtractor;
 import com.github.hyansts.preparedsqlbuilder.db.DbTable;
+import com.github.hyansts.preparedsqlbuilder.query.FromStep;
 import com.github.hyansts.preparedsqlbuilder.query.PreparedSql;
+import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import com.github.hyansts.preparedsqlbuilder.query.impl.SqlQueryFactory;
 
 public class DbTableMapping<E extends DbEntity, ID> {
@@ -33,6 +35,10 @@ public class DbTableMapping<E extends DbEntity, ID> {
 
 	public PreparedSql selectAllQuery() {
 		return SqlQueryFactory.createQuery().select().from(table);
+	}
+
+	public PreparedSql selectQuery(Function<FromStep<SqlQuery>, PreparedSql> query) {
+		return query.apply(SqlQueryFactory.createQuery().select().from(table));
 	}
 
 	public PreparedSql insertQuery(E entity) {
