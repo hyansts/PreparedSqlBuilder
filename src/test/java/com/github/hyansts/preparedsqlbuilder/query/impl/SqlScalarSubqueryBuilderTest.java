@@ -155,4 +155,56 @@ public class SqlScalarSubqueryBuilderTest {
 		assertEquals(expectedValues, query.getValues());
 	}
 
+	@Test
+	public void testExistsConditionalSubquery() {
+
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		final int dep_id = 10;
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlScalarSubquery<Boolean> subquery = SqlQueryFactory.createScalarSubquery();
+		query.select(emp.id)
+			 .from(emp)
+			 .where(subquery.exists(s -> s
+												 .select("1")
+												 .from(dep)
+												 .where(dep.id.le(dep_id))));
+
+		String expected = "SELECT id " +
+								  "FROM employees " +
+								  "WHERE EXISTS (SELECT 1 FROM department WHERE id <= ?)";
+
+		List<Object> expectedValues = List.of(dep_id);
+		assertEquals(expected, query.getSql());
+		assertEquals(expectedValues, query.getValues());
+	}
+
+	@Test
+	public void testNotExistsConditionalSubquery() {
+
+		EmployeesDbTable emp = new EmployeesDbTable();
+		DepartmentDbTable dep = new DepartmentDbTable();
+
+		final int dep_id = 10;
+
+		SqlQuery query = SqlQueryFactory.createQuery();
+		SqlScalarSubquery<Boolean> subquery = SqlQueryFactory.createScalarSubquery();
+		query.select(emp.id)
+			 .from(emp)
+			 .where(subquery.notExists(s -> s
+													.select("1")
+													.from(dep)
+													.where(dep.id.le(dep_id))));
+
+		String expected = "SELECT id " +
+								  "FROM employees " +
+								  "WHERE NOT EXISTS (SELECT 1 FROM department WHERE id <= ?)";
+
+		List<Object> expectedValues = List.of(dep_id);
+		assertEquals(expected, query.getSql());
+		assertEquals(expectedValues, query.getValues());
+	}
+
 }

@@ -19,6 +19,11 @@ public class SqlCondition {
 	private String sql;
 	private int parenthesisLayer = 1;
 
+	public SqlCondition(DbComparableField<?> tf) {
+		addSubqueryValues(tf);
+		this.sql = tf.getFullQualification();
+	}
+
 	public SqlCondition(DbComparableField<?> tf, SqlConditionOperator op) {
 		addSubqueryValues(tf);
 		this.sql = tf.getFullQualification() + op;

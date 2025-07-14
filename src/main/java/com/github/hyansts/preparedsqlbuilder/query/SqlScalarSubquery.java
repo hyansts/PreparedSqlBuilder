@@ -1,5 +1,12 @@
 package com.github.hyansts.preparedsqlbuilder.query;
 
-import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
+import java.util.function.Consumer;
 
-public interface SqlScalarSubquery<T> extends SelectStatement<SqlScalarSubquery<T>>, DbComparableField<T> { }
+import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
+import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
+
+public interface SqlScalarSubquery<T> extends SelectStatement<SqlScalarSubquery<T>>, DbComparableField<T> {
+	SqlCondition exists(Consumer<SelectStatement<SqlScalarSubquery<T>>> select);
+
+	SqlCondition notExists(Consumer<SelectStatement<SqlScalarSubquery<T>>> select);
+}

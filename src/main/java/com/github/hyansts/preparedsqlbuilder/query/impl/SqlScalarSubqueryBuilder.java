@@ -1,21 +1,28 @@
 package com.github.hyansts.preparedsqlbuilder.query.impl;
 
+import java.util.function.Consumer;
+
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldLike;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldOrder;
 import com.github.hyansts.preparedsqlbuilder.db.DbTableLike;
 import com.github.hyansts.preparedsqlbuilder.db.impl.DbTableFieldOrder;
+import com.github.hyansts.preparedsqlbuilder.query.SelectStatement;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
+import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlSortOrder;
 import com.github.hyansts.preparedsqlbuilder.util.StringHolder;
 import com.github.hyansts.preparedsqlbuilder.util.StringUtil;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.AS;
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.EXISTS;
+import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.NOT_EXISTS;
 
 class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> implements SqlScalarSubquery<T> {
 
 	private final StringHolder alias;
 	private final DbTableLike tableLike;
+	private boolean parenthesized = true;
 
 	public SqlScalarSubqueryBuilder() {
 		this.alias = new StringHolder();
@@ -25,6 +32,24 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 	private SqlScalarSubqueryBuilder(StringHolder alias, DbTableLike tableLike) {
 		this.alias = alias;
 		this.tableLike = tableLike;
+	}
+
+	@Override
+	public SqlCondition exists(Consumer<SelectStatement<SqlScalarSubquery<T>>> select) {
+		this.sql.append(EXISTS).append("(");
+		select.accept(this);
+		this.sql.append(')');
+		this.parenthesized = false;
+		return new SqlCondition(this);
+	}
+
+	@Override
+	public SqlCondition notExists(Consumer<SelectStatement<SqlScalarSubquery<T>>> select) {
+		this.sql.append(NOT_EXISTS).append("(");
+		select.accept(this);
+		this.sql.append(')');
+		this.parenthesized = false;
+		return new SqlCondition(this);
 	}
 
 	@Override
@@ -79,7 +104,7 @@ class SqlScalarSubqueryBuilder<T> extends BaseSqlBuilder<SqlScalarSubquery<T>> i
 
 	@Override
 	public String getSql() {
-		return "(" + super.getSql() + ")";
+		return this.parenthesized ? "(" + super.getSql() + ")" : super.getSql();
 	}
 
 }

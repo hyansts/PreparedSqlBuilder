@@ -27,7 +27,9 @@ public enum SqlKeyword {
 	INTERSECT_ALL(" INTERSECT ALL "),
 	EXCEPT(" EXCEPT "),
 	EXCEPT_ALL(" EXCEPT ALL "),
-	AS(" AS ");
+	AS(" AS "),
+	EXISTS("EXISTS "),
+	NOT_EXISTS("NOT EXISTS ");
 
 	private final String keyword;
 
