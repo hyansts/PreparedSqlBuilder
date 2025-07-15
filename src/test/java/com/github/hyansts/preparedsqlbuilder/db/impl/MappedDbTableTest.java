@@ -20,7 +20,7 @@ public class MappedDbTableTest {
 
 	private static class Entity implements DbEntity {
 
-		static class Table extends MappedDbTable<Entity, Integer> {
+		static class Table extends MappedDbTable<Entity, Integer, Table> {
 			public final DbTableField<Integer> id = new DbTableField<>("id", this, Integer.class);
 			public final DbTableField<Integer> field = new DbTableField<>("field", this, Integer.class);
 			public final DbTableField<Integer> field2 = new DbTableField<>("field2", this, Integer.class);
@@ -48,6 +48,7 @@ public class MappedDbTableTest {
 			this.field = field;
 			this.field2 = field2;
 		}
+
 		public Integer getId() { return id; }
 		public void setId(Integer id) { this.id = id; }
 		public Integer getField() { return field; }
@@ -58,8 +59,7 @@ public class MappedDbTableTest {
 
 	@Test
 	public void testSelectByIdQuery() {
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		PreparedSql query = mapping.selectByIdQuery(1);
 		assertEquals("SELECT * FROM table WHERE id = ?", query.getSql());
 		assertEquals(List.of(1), query.getValues());
@@ -67,8 +67,7 @@ public class MappedDbTableTest {
 
 	@Test
 	public void testSelectAllQuery() {
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		PreparedSql query = mapping.selectAllQuery();
 		assertEquals("SELECT * FROM table", query.getSql());
 		assertEquals(Collections.EMPTY_LIST, query.getValues());
@@ -76,18 +75,24 @@ public class MappedDbTableTest {
 
 	@Test
 	public void testSelectQuery() {
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
-		PreparedSql query = mapping.selectQuery(q -> q.where(tb.field.eq(2)).limit(1));
+		var mapping = new Entity.Table().getMapping();
+		PreparedSql query = mapping.selectQuery((q, tb) -> q.where(tb.field.eq(2)).limit(1));
 		assertEquals("SELECT * FROM table WHERE field = ? LIMIT ?", query.getSql());
+		assertEquals(List.of(2, 1), query.getValues());
+	}
+
+	@Test
+	public void testSelectCountQuery() {
+		var mapping = new Entity.Table().getMapping();
+		PreparedSql query = mapping.selectCountQuery((q, tb) -> q.where(tb.field.eq(2)).limit(1));
+		assertEquals("SELECT COUNT(*) FROM table WHERE field = ? LIMIT ?", query.getSql());
 		assertEquals(List.of(2, 1), query.getValues());
 	}
 
 	@Test
 	public void testInsertQuery() {
 		Entity entity = new Entity(1, 2, 3);
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		PreparedSql query = mapping.insertQuery(entity);
 		assertEquals("INSERT INTO table (id, field, field2) VALUES (?, ?, ?)", query.getSql());
 		assertEquals(List.of(1, 2, 3), query.getValues());
@@ -96,26 +101,42 @@ public class MappedDbTableTest {
 	@Test
 	public void testUpdateQuery() {
 		Entity entity = new Entity(1, 2, 3);
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		PreparedSql query = mapping.updateQuery(entity);
 		assertEquals("UPDATE table SET field = ?, field2 = ? WHERE id = ?", query.getSql());
 		assertEquals(List.of(2, 3, 1), query.getValues());
 	}
 
 	@Test
+	public void testUpdateQueryCustom() {
+		var mapping = new Entity.Table().getMapping();
+		PreparedSql query = mapping.updateQuery(
+				(q, tb) ->
+						q.set(tb.field.value(2), tb.field2.value(3))
+						 .where(tb.id.ge(1).and(tb.id.le(10))));
+		assertEquals("UPDATE table SET field = ?, field2 = ? WHERE id >= ? AND id <= ?", query.getSql());
+		assertEquals(List.of(2, 3, 1, 10), query.getValues());
+	}
+
+	@Test
 	public void testDeleteQuery() {
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		PreparedSql query = mapping.deleteQuery(1);
 		assertEquals("DELETE FROM table WHERE id = ?", query.getSql());
 		assertEquals(List.of(1), query.getValues());
 	}
 
 	@Test
+	public void testDeleteQueryCustom() {
+		var mapping = new Entity.Table().getMapping();
+		PreparedSql query = mapping.deleteQuery((q, tb) -> q.where(tb.id.notIn(List.of(1, 2, 3))));
+		assertEquals("DELETE FROM table WHERE id NOT IN (?, ?, ?)", query.getSql());
+		assertEquals(List.of(1, 2, 3), query.getValues());
+	}
+
+	@Test
 	public void testMapToEntity() {
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 
 		Map<String, Integer> values = Map.of("id", 1, "field", 2, "field2", 3);
 
@@ -137,8 +158,7 @@ public class MappedDbTableTest {
 	@Test
 	public void testExtractNonPrimaryKeyValues() {
 		Entity entity = new Entity(1, 2, 3);
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		DbFieldValue<?>[] values = mapping.getFieldMapping().getNonPrimaryKeyValues(entity);
 		assertEquals(2, values.length, "Expected 2 fields");
 		assertEquals(2, values[0].getValue(), "Expected field value 2");
@@ -150,8 +170,7 @@ public class MappedDbTableTest {
 	@Test
 	public void testExtractPrimaryKeyValues() {
 		Entity entity = new Entity(1, 2, 3);
-		Entity.Table tb = new Entity.Table();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new Entity.Table().getMapping();
 		DbFieldValue<?>[] values = mapping.getFieldMapping().getPrimaryKeyValues(entity);
 		assertEquals(1, values.length, "Expected 1 primary key");
 		assertEquals(1, values[0].getValue(), "Expected primary key value 1");
@@ -161,7 +180,7 @@ public class MappedDbTableTest {
 	@Test
 	public void testNoPrimaryKeyMappedError() {
 
-		class NoPkTable extends MappedDbTable<Entity, Integer> {
+		class NoPkTable extends MappedDbTable<Entity, Integer, NoPkTable> {
 
 			final DbTableField<Integer> id = new DbTableField<>("id", this, Integer.class);
 			final DbTableField<Integer> field = new DbTableField<>("field", this, Integer.class);
@@ -180,8 +199,7 @@ public class MappedDbTableTest {
 		}
 
 		Entity entity = new Entity(1, 2, 3);
-		NoPkTable tb = new NoPkTable();
-		DbTableMapping<Entity, Integer> mapping = tb.getMapping();
+		var mapping = new NoPkTable().getMapping();
 		Exception e = assertThrows(IllegalStateException.class, () -> {
 			mapping.getFieldMapping().getPrimaryKeyCondition(entity);
 		});
