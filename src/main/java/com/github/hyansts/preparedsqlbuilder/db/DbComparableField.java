@@ -1,7 +1,5 @@
 package com.github.hyansts.preparedsqlbuilder.db;
 
-import java.util.List;
-
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
 import com.github.hyansts.preparedsqlbuilder.sql.SqlCondition;
 
@@ -113,7 +111,7 @@ public interface DbComparableField<T> extends DbSortableField {
 		return new SqlCondition(this, IS_NOT_NULL);
 	}
 
-	default SqlCondition in(List<T> values) {
+	default SqlCondition in(Iterable<T> values) {
 		return new SqlCondition(this, IN, values);
 	}
 
@@ -121,7 +119,7 @@ public interface DbComparableField<T> extends DbSortableField {
 		return new SqlCondition(this, IN, subquery);
 	}
 
-	default SqlCondition notIn(List<T> values) {
+	default SqlCondition notIn(Iterable<T> values) {
 		return new SqlCondition(this, NOT_IN, values);
 	}
 

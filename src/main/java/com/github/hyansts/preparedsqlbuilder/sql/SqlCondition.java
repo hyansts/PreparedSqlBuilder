@@ -3,6 +3,7 @@ package com.github.hyansts.preparedsqlbuilder.sql;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbComparableField;
 import com.github.hyansts.preparedsqlbuilder.query.SqlScalarSubquery;
@@ -62,17 +63,12 @@ public class SqlCondition {
 		this.sql = tf1.getFullQualification() + op1 + "?" + op2 + tf2.getFullQualification();
 	}
 
-	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, List<T> values) {
-
-		StringBuilder valueString = new StringBuilder("(");
-		for (int i = 0; i < values.size(); i++) {
-			this.comparedValues.add(values.get(i));
-			valueString.append('?');
-			if (i < values.size() - 1) {
-				valueString.append(", ");
-			}
-		}
-		valueString.append(')');
+	public <T> SqlCondition(DbComparableField<T> tf1, SqlConditionOperator op, Iterable<T> values) {
+		StringJoiner valueString = new StringJoiner(", ", "(", ")");
+		values.forEach(value -> {
+			this.comparedValues.add(value);
+			valueString.add("?");
+		});
 		this.sql = tf1.getFullQualification() + op + valueString;
 	}
 
