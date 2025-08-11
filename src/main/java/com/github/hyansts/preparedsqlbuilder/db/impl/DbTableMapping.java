@@ -7,6 +7,7 @@ import com.github.hyansts.preparedsqlbuilder.db.DbEntity;
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldExtractor;
 import com.github.hyansts.preparedsqlbuilder.query.DeleteStep;
 import com.github.hyansts.preparedsqlbuilder.query.FromStep;
+import com.github.hyansts.preparedsqlbuilder.query.InsertStep;
 import com.github.hyansts.preparedsqlbuilder.query.PreparedSql;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import com.github.hyansts.preparedsqlbuilder.query.UpdateStep;
@@ -51,6 +52,10 @@ public class DbTableMapping<E extends DbEntity, ID, T extends MappedDbTable<E, I
 		return SqlQueryFactory.createQuery()
 							  .insertInto(table)
 							  .values(fieldMapping.getAllFieldValues(entity));
+	}
+
+	public PreparedSql insertQuery(BiFunction<InsertStep, T, PreparedSql> query) {
+		return query.apply(SqlQueryFactory.createQuery().insertInto(table), table);
 	}
 
 	public PreparedSql updateQuery(E entity) {

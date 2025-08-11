@@ -99,6 +99,16 @@ public class MappedDbTableTest {
 	}
 
 	@Test
+	public void testInsertQueryConsumer() {
+		var mapping = new Entity.Table().getMapping();
+		PreparedSql query = mapping.insertQuery(
+				(q, tb) ->
+						q.values(tb.id.value(1), tb.field.value(2), tb.field2.value(3)));
+		assertEquals("INSERT INTO table (id, field, field2) VALUES (?, ?, ?)", query.getSql());
+		assertEquals(List.of(1, 2, 3), query.getValues());
+	}
+
+	@Test
 	public void testUpdateQuery() {
 		Entity entity = new Entity(1, 2, 3);
 		var mapping = new Entity.Table().getMapping();
