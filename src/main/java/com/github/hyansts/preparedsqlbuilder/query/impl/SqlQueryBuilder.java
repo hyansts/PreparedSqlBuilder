@@ -1,15 +1,20 @@
 package com.github.hyansts.preparedsqlbuilder.query.impl;
 
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 import com.github.hyansts.preparedsqlbuilder.db.DbFieldValue;
 import com.github.hyansts.preparedsqlbuilder.db.DbTable;
+import com.github.hyansts.preparedsqlbuilder.query.DeleteStatement;
 import com.github.hyansts.preparedsqlbuilder.query.DeleteStep;
+import com.github.hyansts.preparedsqlbuilder.query.InsertStatement;
 import com.github.hyansts.preparedsqlbuilder.query.InsertStep;
 import com.github.hyansts.preparedsqlbuilder.query.PreparedSql;
 import com.github.hyansts.preparedsqlbuilder.query.SetStep;
+import com.github.hyansts.preparedsqlbuilder.query.SqlBatchQuery;
 import com.github.hyansts.preparedsqlbuilder.query.SqlQuery;
 import com.github.hyansts.preparedsqlbuilder.query.UpdateQuerySteps;
+import com.github.hyansts.preparedsqlbuilder.query.UpdateStatement;
 import com.github.hyansts.preparedsqlbuilder.query.UpdateStep;
 
 import static com.github.hyansts.preparedsqlbuilder.sql.SqlKeyword.*;
@@ -149,6 +154,118 @@ class SqlQueryBuilder extends BaseSqlBuilder<SqlQuery> implements SqlQuery, Upda
 		}
 		this.sql.append(joinedFields).append(VALUES).append(joinedValues);
 		return this;
+	}
+
+	/**
+	 * Creates a new batch SQL query builder.
+	 * <p>
+	 * The returned builder can be used to build a batch SQL query.
+	 * <p>
+	 * The InsertStatement consumer is used to build the SQL query. It's necessary to provide dummy values to indicate
+	 * which fields will be used. The actual values are added later using the
+	 * {@link SqlBatchQuery#addBatch(Object...)} method.
+	 * <p>
+	 * Example:
+	 * <pre>{@code
+	 * SqlBatchQuery query = SqlQueryFactory.batchInsert(
+	 * 		(q) -> {
+	 * 			q.insertInto(employees)
+	 * 			 .values(employees.id.value(null),
+	 * 					 employees.name.value(null),
+	 * 					 employees.age.value(null));
+	 *        });
+	 *
+	 * 	query.addBatch(1, "John", 20)
+	 * 		 .addBatch(2, "Jane", 25)
+	 * 		 .addBatch(3, "Bob", 30);
+	 *
+	 * String sql = query.getSql();}
+	 * </pre>
+	 * Expected SQL:
+	 * <p>
+	 * {@code "INSERT INTO employees (id, name, age) VALUES (?, ?, ?)"}
+	 *
+	 * @return a new SQL query builder.
+	 */
+	@Override
+	public SqlBatchQuery batchInsert(Consumer<InsertStatement> query) {
+		var queryBuilder = new SqlQueryBuilder();
+		query.accept(queryBuilder);
+		return new SqlBatchBuilder(queryBuilder.getSql());
+	}
+
+	/**
+	 * Creates a new batch SQL query builder.
+	 * <p>
+	 * The returned builder can be used to build a batch SQL query.
+	 * <p>
+	 * The UpdateStatement consumer is used to build the SQL query. It's necessary to provide dummy values to indicate
+	 * which fields will be used. The actual values are added later using the
+	 * {@link SqlBatchQuery#addBatch(Object...)} method.
+	 * <p>
+	 * Example:
+	 * <pre>{@code
+	 * SqlBatchQuery query = SqlQueryFactory.batchUpdate(
+	 * 		(q) -> {
+	 * 			q.update(employees)
+	 * 			 .set(employees.name.value(null),
+	 * 				  employees.age.value(null))
+	 * 			 .where(employees.id.eq(null));
+	 *        });
+	 *
+	 * 	query.addBatch("John", 20, 1)
+	 * 		 .addBatch("Jane", 25, 2)
+	 * 		 .addBatch("Bob", 30, 3);
+	 *
+	 * String sql = query.getSql();}
+	 * </pre>
+	 * Expected SQL:
+	 * <p>
+	 * {@code "UPDATE employees SET name = ?, age = ? WHERE id = ?"}
+	 *
+	 * @return a new SQL query builder.
+	 */
+	@Override
+	public SqlBatchQuery batchUpdate(Consumer<UpdateStatement> query) {
+		var queryBuilder = new SqlQueryBuilder();
+		query.accept(queryBuilder);
+		return new SqlBatchBuilder(queryBuilder.getSql());
+	}
+
+	/**
+	 * Creates a new batch SQL query builder.
+	 * <p>
+	 * The returned builder can be used to build a batch SQL query.
+	 * <p>
+	 * The DeleteStatement consumer is used to build the SQL query. It's necessary to provide dummy values to indicate
+	 * which fields will be used. The actual values are added later using the
+	 * {@link SqlBatchQuery#addBatch(Object...)} method.
+	 * <p>
+	 * Example:
+	 * <pre>{@code
+	 * SqlBatchQuery query = SqlQueryFactory.batchDelete(
+	 * 		(q) -> {
+	 * 			q.deleteFrom(employees)
+	 * 			 .where(employees.name.eq(null).and(employees.age.eq(null)));
+	 *        });
+	 *
+	 * 	query.addBatch("John", 20)
+	 * 		 .addBatch("Jane", 25)
+	 * 		 .addBatch("Bob", 30);
+	 *
+	 * String sql = query.getSql();}
+	 * </pre>
+	 * Expected SQL:
+	 * <p>
+	 * {@code "DELETE FROM employees WHERE name = ? AND age = ?"}
+	 *
+	 * @return a new SQL query builder.
+	 */
+	@Override
+	public SqlBatchQuery batchDelete(Consumer<DeleteStatement> query) {
+		var queryBuilder = new SqlQueryBuilder();
+		query.accept(queryBuilder);
+		return new SqlBatchBuilder(queryBuilder.getSql());
 	}
 
 	/**
